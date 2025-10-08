@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buscar Eventos - WorkFlowly</title>
+    <link rel="stylesheet" href="search-events.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="nav-brand">
+                <a href="/" class="logo">
+                    <div class="logo-circle">
+                        <span>W</span>
+                    </div>
+                    <span class="brand-name">WorkFlowly</span>
+                </a>
+            </div>
+            <nav class="nav-menu">
+                <a href="#eventos" class="active">Eventos</a>
+                <a href="#como-funciona">Cómo funciona</a>
+                <a href="#organizadores">Organizadores</a>
+            </nav>
+            <div class="nav-actions">
+                <button class="btn-secondary">Iniciar Sesión</button>
+                <button class="btn-primary">Registrarse</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Search Section -->
+    <section class="search-section">
+        <div class="container">
+            <div class="search-header">
+                <h1>Encuentra tu evento perfecto</h1>
+                <p>Descubre eventos increíbles cerca de ti sin precios inflados</p>
+            </div>
+            
+            <div class="search-box">
+                <div class="search-field">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="¿Qué evento buscas?" value="Conciertos">
+                </div>
+                <div class="search-field">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <select>
+                        <option>Madrid</option>
+                        <option>Barcelona</option>
+                        <option>Valencia</option>
+                        <option>Sevilla</option>
+                    </select>
+                </div>
+                <div class="search-field">
+                    <i class="fas fa-calendar"></i>
+                    <input type="date" value="2025-06-15">
+                </div>
+                <button class="btn-search">Buscar</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Filters and Results -->
+    <section class="results-section">
+        <div class="container">
+            <div class="results-layout">
+                <!-- Sidebar Filters -->
+                <aside class="filters-sidebar">
+                    <div class="filters-header">
+                        <h3>Filtros</h3>
+                        <button class="clear-filters">Limpiar todo</button>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Categorías</h4>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" checked>
+                                <span class="checkmark"></span>
+                                Música <span class="count">(45)</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Teatro <span class="count">(23)</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Deportes <span class="count">(18)</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Familia <span class="count">(32)</span>
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Gastronómico <span class="count">(12)</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Precio</h4>
+                        <div class="price-range">
+                            <div class="price-inputs">
+                                <input type="number" placeholder="Min" value="0">
+                                <span>-</span>
+                                <input type="number" placeholder="Max" value="200">
+                            </div>
+                            <div class="price-slider">
+                                <input type="range" min="0" max="500" value="200" class="slider">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Fecha</h4>
+                        <div class="filter-options">
+                            <label class="filter-radio">
+                                <input type="radio" name="date" value="today">
+                                <span class="radiomark"></span>
+                                Hoy
+                            </label>
+                            <label class="filter-radio">
+                                <input type="radio" name="date" value="tomorrow">
+                                <span class="radiomark"></span>
+                                Mañana
+                            </label>
+                            <label class="filter-radio">
+                                <input type="radio" name="date" value="weekend" checked>
+                                <span class="radiomark"></span>
+                                Este fin de semana
+                            </label>
+                            <label class="filter-radio">
+                                <input type="radio" name="date" value="week">
+                                <span class="radiomark"></span>
+                                Esta semana
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="filter-group">
+                        <h4>Disponibilidad</h4>
+                        <div class="filter-options">
+                            <label class="filter-checkbox">
+                                <input type="checkbox" checked>
+                                <span class="checkmark"></span>
+                                Con entradas disponibles
+                            </label>
+                            <label class="filter-checkbox">
+                                <input type="checkbox">
+                                <span class="checkmark"></span>
+                                Últimas entradas
+                            </label>
+                        </div>
+                    </div>
+                </aside>
+
+                <!-- Results Area -->
+                <main class="results-main">
+                    <div class="results-header">
+                        <div class="results-info">
+                            <h2>Conciertos en Madrid</h2>
+                            <p>45 eventos encontrados</p>
+                        </div>
+                        <div class="results-controls">
+                            <div class="sort-dropdown">
+                                <select>
+                                    <option>Más relevantes</option>
+                                    <option>Precio: menor a mayor</option>
+                                    <option>Precio: mayor a menor</option>
+                                    <option>Fecha: más próximo</option>
+                                    <option>Más populares</option>
+                                </select>
+                            </div>
+                            <div class="view-toggle">
+                                <button class="view-btn active" data-view="grid">
+                                    <i class="fas fa-th"></i>
+                                </button>
+                                <button class="view-btn" data-view="list">
+                                    <i class="fas fa-list"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="events-grid">
+                        <div class="event-card">
+                            <div class="event-image">
+                                <div class="event-badge">Trending</div>
+                                <button class="favorite-btn">
+                                    <i class="fas fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="event-content">
+                                <div class="event-category">Música</div>
+                                <h3>Festival Summer Vibes 2025</h3>
+                                <div class="event-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>15 Jun 2025, 20:00</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>WiZink Center, Madrid</span>
+                                    </div>
+                                </div>
+                                <div class="event-footer">
+                                    <div class="price-info">
+                                        <span class="price">Desde 35€</span>
+                                        <span class="availability">Pocas entradas</span>
+                                    </div>
+                                    <button class="btn-primary">Ver entradas</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-image">
+                                <button class="favorite-btn">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="event-content">
+                                <div class="event-category">Música</div>
+                                <h3>Concierto Estopa</h3>
+                                <div class="event-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>18 Jun 2025, 21:30</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Palacio de Deportes, Madrid</span>
+                                    </div>
+                                </div>
+                                <div class="event-footer">
+                                    <div class="price-info">
+                                        <span class="price">Desde 42€</span>
+                                        <span class="availability available">Disponible</span>
+                                    </div>
+                                    <button class="btn-primary">Ver entradas</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-image">
+                                <div class="event-badge sold-out">Agotado</div>
+                                <button class="favorite-btn">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="event-content">
+                                <div class="event-category">Música</div>
+                                <h3>Bad Bunny World Tour</h3>
+                                <div class="event-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>22 Jun 2025, 20:00</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Santiago Bernabéu, Madrid</span>
+                                    </div>
+                                </div>
+                                <div class="event-footer">
+                                    <div class="price-info">
+                                        <span class="price">Desde 89€</span>
+                                        <span class="availability sold-out">Agotado</span>
+                                    </div>
+                                    <button class="btn-secondary" disabled>Lista de espera</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-image">
+                                <button class="favorite-btn">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="event-content">
+                                <div class="event-category">Música</div>
+                                <h3>Metallica: M72 World Tour</h3>
+                                <div class="event-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>25 Jun 2025, 19:00</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Cívitas Metropolitano, Madrid</span>
+                                    </div>
+                                </div>
+                                <div class="event-footer">
+                                    <div class="price-info">
+                                        <span class="price">Desde 75€</span>
+                                        <span class="availability available">Disponible</span>
+                                    </div>
+                                    <button class="btn-primary">Ver entradas</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-image">
+                                <button class="favorite-btn">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="event-content">
+                                <div class="event-category">Música</div>
+                                <h3>Indie Music Festival</h3>
+                                <div class="event-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>28 Jun 2025, 18:00</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Matadero Madrid, Madrid</span>
+                                    </div>
+                                </div>
+                                <div class="event-footer">
+                                    <div class="price-info">
+                                        <span class="price">Desde 28€</span>
+                                        <span class="availability available">Disponible</span>
+                                    </div>
+                                    <button class="btn-primary">Ver entradas</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="event-card">
+                            <div class="event-image">
+                                <button class="favorite-btn">
+                                    <i class="far fa-heart"></i>
+                                </button>
+                            </div>
+                            <div class="event-content">
+                                <div class="event-category">Música</div>
+                                <h3>Jazz Night Sessions</h3>
+                                <div class="event-details">
+                                    <div class="detail-item">
+                                        <i class="fas fa-calendar"></i>
+                                        <span>30 Jun 2025, 22:00</span>
+                                    </div>
+                                    <div class="detail-item">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Café Central, Madrid</span>
+                                    </div>
+                                </div>
+                                <div class="event-footer">
+                                    <div class="price-info">
+                                        <span class="price">Desde 15€</span>
+                                        <span class="availability available">Disponible</span>
+                                    </div>
+                                    <button class="btn-primary">Ver entradas</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Pagination -->
+                    <div class="pagination">
+                        <button class="page-btn" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="page-btn active">1</button>
+                        <button class="page-btn">2</button>
+                        <button class="page-btn">3</button>
+                        <span class="page-dots">...</span>
+                        <button class="page-btn">8</button>
+                        <button class="page-btn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </main>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-brand">
+                    <div class="logo">
+                        <div class="logo-circle">
+                            <span>W</span>
+                        </div>
+                        <span class="brand-name">WorkFlowly</span>
+                    </div>
+                    <p>La plataforma de ticketing que revoluciona la compra de entradas.</p>
+                </div>
+                <div class="footer-links">
+                    <div class="link-group">
+                        <h4>Eventos</h4>
+                        <a href="#">Conciertos</a>
+                        <a href="#">Teatro</a>
+                        <a href="#">Deportes</a>
+                        <a href="#">Familia</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Soporte</h4>
+                        <a href="#">Centro de Ayuda</a>
+                        <a href="#">Contacto</a>
+                        <a href="#">FAQ</a>
+                    </div>
+                    <div class="link-group">
+                        <h4>Legal</h4>
+                        <a href="#">Términos</a>
+                        <a href="#">Privacidad</a>
+                        <a href="#">Cookies</a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 WorkFlowly. Todos los derechos reservados.</p>
+            </div>
+        </div>
+    </footer>
+</body>
+</html>
