@@ -521,6 +521,15 @@ body {
     justify-content: center;
     flex-wrap: wrap;
 }
+.cta-section .btn-secondary {
+    color: var(--white);
+    border-color: var(--white);
+}
+
+.cta-section .btn-secondary:hover {
+    background: var(--white);
+    color: var(--secondary-color);
+}
 
 /* Footer */
 .footer {
