@@ -363,13 +363,13 @@ body {
 .filter-checkbox input:checked + .checkmark::after {
     content: '';
     position: absolute;
-    left: 6px;
-    top: 2px;
+    top: 50%;
+    left: 50%;
     width: 4px;
     height: 8px;
     border: solid var(--white);
     border-width: 0 2px 2px 0;
-    transform: rotate(45deg);
+    transform: translate(-50%, -60%) rotate(45deg);
 }
 
 .count {
@@ -413,12 +413,13 @@ body {
 .filter-radio input:checked + .radiomark::after {
     content: '';
     position: absolute;
-    top: 3px;
-    left: 3px;
+    top: 50%;
+    left: 50%;
     width: 8px;
     height: 8px;
     border-radius: 50%;
     background: var(--primary-color);
+    transform: translate(-50%, -50%);
 }
 
 /* Price Range */
@@ -431,6 +432,7 @@ body {
     align-items: center;
     gap: var(--spacing-sm);
     margin-bottom: var(--spacing-sm);
+    max-width: 100%;
 }
 
 .price-inputs input {
@@ -440,7 +442,18 @@ body {
     border-radius: var(--border-radius-small);
     font-size: 14px;
     text-align: center;
+    min-width: 0;         
+    width: 100%;
 }
+.price-inputs span {
+  flex: 0 0 auto;       
+}
+
+
+.price-inputs input[type="number"] {
+  min-width: 0;
+}
+
 
 .price-slider {
     margin-top: var(--spacing-sm);
@@ -887,3 +900,6 @@ body {
         gap: var(--spacing-xs);
     }
 }
+
+
+
