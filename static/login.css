@@ -378,7 +378,8 @@ body {
 
 .toggle-password {
     position: absolute;
-    right: 16px;
+    right: 35px;
+    top: 15px;
     background: none;
     border: none;
     color: var(--text-light);
