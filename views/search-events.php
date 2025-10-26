@@ -169,7 +169,7 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                                     <div class="event-image">
                                         <img src="<?php echo UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>" 
                                              alt="<?php echo htmlspecialchars($evento['nombre']); ?>"
-                                             onerror="this.src='https://imgur.com/a/tK1HnYn'">
+                                             onerror="this.src='https://i.imgur.com/yGh7PhM.jpeg'">
                                         <span class="event-category"><?php echo htmlspecialchars($evento['tipo']); ?></span>
                                         <button class="favorite-btn">
                                             <i class="far fa-heart"></i>
