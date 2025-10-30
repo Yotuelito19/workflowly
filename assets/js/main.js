@@ -226,4 +226,34 @@ function resetPriceFilter() {
 // Inicializar radio buttons deseleccionables cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     initDeselectableRadioButtons();
+<<<<<<< HEAD
 });
+=======
+});
+
+async function cargarLugares() {
+  const res = await fetch('../../api/admin/lugares/listar.php');
+  const lugares = await res.json();
+  const sel = document.getElementById('idLugar');
+  sel.innerHTML = '<option value="">-- Selecciona lugar --</option>';
+  lugares.forEach(l => {
+    const opt = document.createElement('option');
+    opt.value = l.idLugar;
+    opt.textContent = l.nombre;
+    sel.appendChild(opt);
+  });
+}
+
+async function cargarOrganizadores() {
+  const res = await fetch('../../api/admin/organizadores/listar.php');
+  const orgs = await res.json();
+  const sel = document.getElementById('idOrganizador');
+  sel.innerHTML = '<option value="">-- Selecciona organizador --</option>';
+  orgs.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.idOrganizador;
+    opt.textContent = o.nombre;
+    sel.appendChild(opt);
+  });
+}
+>>>>>>> feature/unionTest
