@@ -12,14 +12,16 @@ $tipo = isset($_GET['tipo']) ? sanitize_input($_GET['tipo']) : '';
 $ubicacion = isset($_GET['ubicacion']) ? sanitize_input($_GET['ubicacion']) : '';
 $fecha_desde = isset($_GET['fecha_desde']) ? sanitize_input($_GET['fecha_desde']) : '';
 $fecha_hasta = isset($_GET['fecha_hasta']) ? sanitize_input($_GET['fecha_hasta']) : '';
+$precio_min = isset($_GET['precio_min']) ? (int)$_GET['precio_min'] : 0;
+$precio_max = isset($_GET['precio_max']) ? (int)$_GET['precio_max'] : 0;
 
 // Conectar BD y obtener eventos
 $database = new Database();
 $db = $database->getConnection();
 $eventoModel = new Evento($db);
 
-if (!empty($search) || !empty($tipo) || !empty($fecha_desde) || !empty($fecha_hasta)) {
-    $eventos = $eventoModel->buscarEventos($search, $tipo, $fecha_desde, $fecha_hasta);
+if (!empty($search) || !empty($tipo) || !empty($fecha_desde) || !empty($fecha_hasta) || !empty($ubicacion) || $precio_min > 0 || $precio_max > 0) {
+    $eventos = $eventoModel->buscarEventos($search, $tipo, $fecha_desde, $fecha_hasta, $ubicacion, $precio_min, $precio_max);
 } else {
     $eventos = $eventoModel->obtenerEventosDisponibles(50, 0);
 }
@@ -38,34 +40,11 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
     <title>Buscar Eventos - WorkFlowly</title>
     <link rel="stylesheet" href="../assets/css/search-events.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="../assets/js/main.js" defer></script>
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-brand">
-                <a href="../index.php" class="logo">
-                    <div class="logo-circle">
-                        <span>W</span>
-                    </div>
-                    <span class="brand-name">WorkFlowly</span>
-                </a>
-            </div>
-            <nav class="nav-menu">
-                <a href="search-events.php" class="active">Eventos</a>
-                <a href="../index.php">Inicio</a>
-            </nav>
-            <div class="nav-actions">
-                <?php if (is_logged_in()): ?>
-                    <a href="account.php" class="btn-secondary">Mi Cuenta</a>
-                    <a href="../api/logout.php" class="btn-link">Cerrar Sesión</a>
-                <?php else: ?>
-                    <a href="login.php" class="btn-secondary">Iniciar Sesión</a>
-                    <a href="login.php" class="btn-primary">Registrarse</a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/../includes/header.php'; ?>
 
     <!-- Search Section -->
     <section class="search-section">
@@ -82,11 +61,19 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                 </div>
                 <div class="search-field">
                     <i class="fas fa-map-marker-alt"></i>
-                    <input type="text" name="ubicacion" placeholder="Ciudad" value="<?php echo htmlspecialchars($ubicacion); ?>">
+                    <select name="ubicacion">
+                        <option value="">Todas las ciudades</option>
+                        <option value="Madrid" <?php echo $ubicacion === 'Madrid' ? 'selected' : ''; ?>>Madrid</option>
+                        <option value="Barcelona" <?php echo $ubicacion === 'Barcelona' ? 'selected' : ''; ?>>Barcelona</option>
+                        <option value="Valencia" <?php echo $ubicacion === 'Valencia' ? 'selected' : ''; ?>>Valencia</option>
+                        <option value="Sevilla" <?php echo $ubicacion === 'Sevilla' ? 'selected' : ''; ?>>Sevilla</option>
+                    </select>
                 </div>
-                <div class="search-field">
+                <div class="search-field date-range">
                     <i class="fas fa-calendar"></i>
-                    <input type="date" name="fecha_desde" value="<?php echo htmlspecialchars($fecha_desde); ?>">
+                    <input type="date" name="fecha_desde" placeholder="Desde" value="<?php echo htmlspecialchars($fecha_desde); ?>">
+                    <span class="date-separator">-</span>
+                    <input type="date" name="fecha_hasta" placeholder="Hasta" value="<?php echo htmlspecialchars($fecha_hasta); ?>">
                 </div>
                 <button type="submit" class="btn-search">Buscar</button>
             </form>
@@ -106,40 +93,41 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
 
                     <form method="GET" action="">
                         <input type="hidden" name="search" value="<?php echo htmlspecialchars($search); ?>">
+                        <input type="hidden" name="ubicacion" value="<?php echo htmlspecialchars($ubicacion); ?>">
+                        <input type="hidden" name="fecha_desde" value="<?php echo htmlspecialchars($fecha_desde); ?>">
+                        <input type="hidden" name="fecha_hasta" value="<?php echo htmlspecialchars($fecha_hasta); ?>">
                         
+                        <!-- Categorías (Radio buttons) -->
                         <div class="filter-group">
                             <h4>Categorías</h4>
                             <div class="filter-options">
                                 <?php foreach ($tiposEventos as $tipoEvento): ?>
-                                <label class="filter-checkbox">
+                                <label class="filter-radio">
                                     <input type="radio" name="tipo" value="<?php echo htmlspecialchars($tipoEvento); ?>" 
                                            <?php echo $tipo === $tipoEvento ? 'checked' : ''; ?>
                                            onchange="this.form.submit()">
-                                    <span class="checkmark"></span>
+                                    <span class="radiomark"></span>
                                     <?php echo htmlspecialchars($tipoEvento); ?>
                                 </label>
                                 <?php endforeach; ?>
-                                
-                                <?php if (!empty($tipo)): ?>
-                                <label class="filter-checkbox">
-                                    <input type="radio" name="tipo" value="" onchange="this.form.submit()">
-                                    <span class="checkmark"></span>
-                                    Todos
-                                </label>
-                                <?php endif; ?>
                             </div>
                         </div>
 
+                        <!-- Filtro de Precio -->
                         <div class="filter-group">
-                            <h4>Rango de fechas</h4>
-                            <div class="filter-options">
-                                <div class="date-range">
-                                    <label>Desde:</label>
-                                    <input type="date" name="fecha_desde" value="<?php echo htmlspecialchars($fecha_desde); ?>">
-                                </div>
-                                <div class="date-range">
-                                    <label>Hasta:</label>
-                                    <input type="date" name="fecha_hasta" value="<?php echo htmlspecialchars($fecha_hasta); ?>">
+                            <div class="filter-group-header">
+                                <h4>Precio</h4>
+                                <?php if ($precio_min > 0 || $precio_max > 0): ?>
+                                    <button type="button" class="reset-price-btn" onclick="resetPriceFilter()">Resetear</button>
+                                <?php endif; ?>
+                            </div>
+                            <div class="price-range">
+                                <div class="price-inputs">
+                                    <input type="number" name="precio_min" id="precio_min" placeholder="Min" min="0" 
+                                           value="<?php echo $precio_min > 0 ? $precio_min : ''; ?>">
+                                    <span>-</span>
+                                    <input type="number" name="precio_max" id="precio_max" placeholder="Max" min="0" 
+                                           value="<?php echo $precio_max > 0 ? $precio_max : ''; ?>">
                                 </div>
                                 <button type="submit" class="btn-primary" style="width: 100%; margin-top: 10px;">Aplicar</button>
                             </div>
@@ -169,7 +157,7 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                                     <div class="event-image">
                                         <img src="<?php echo UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>" 
                                              alt="<?php echo htmlspecialchars($evento['nombre']); ?>"
-                                             onerror="this.src='https://i.imgur.com/yGh7PhM.jpeg'">
+                                             onerror="this.src='https://via.placeholder.com/400x250?text=<?php echo urlencode($evento['nombre']); ?>'">
                                         <span class="event-category"><?php echo htmlspecialchars($evento['tipo']); ?></span>
                                         <button class="favorite-btn">
                                             <i class="far fa-heart"></i>
@@ -216,10 +204,6 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <p>&copy; 2025 WorkFlowly. Todos los derechos reservados.</p>
-        </div>
-    </footer>
+    <?php include __DIR__ . '/../includes/footer.php'; ?>
 </body>
 </html>

@@ -51,8 +51,9 @@ class Evento {
 
     /**
      * Buscar eventos por filtros
+     * ACTUALIZADO: Incluye filtros de precio mínimo y máximo
      */
-    public function buscarEventos($search = '', $tipo = '', $fecha_desde = '', $fecha_hasta = '') {
+    public function buscarEventos($search = '', $tipo = '', $fecha_desde = '', $fecha_hasta = '', $ubicacion = '', $precio_min = 0, $precio_max = 0) {
         $query = "SELECT e.*, u.nombre as organizador_nombre, u.apellidos as organizador_apellidos,
                          est.nombre as estado_nombre,
                          (SELECT MIN(precio) FROM TipoEntrada WHERE idEvento = e.idEvento) as precio_desde
@@ -71,12 +72,32 @@ class Evento {
             $query .= " AND e.tipo = :tipo";
         }
 
+        if (!empty($ubicacion)) {
+            $query .= " AND e.ubicacion LIKE :ubicacion";
+        }
+
         if (!empty($fecha_desde)) {
             $query .= " AND DATE(e.fechaInicio) >= :fecha_desde";
         }
 
         if (!empty($fecha_hasta)) {
             $query .= " AND DATE(e.fechaInicio) <= :fecha_hasta";
+        }
+
+        // NUEVO: Filtros de precio
+        // Se usa HAVING porque precio_desde es un campo calculado con subconsulta
+        $hasPriceFilter = false;
+        if ($precio_min > 0 || $precio_max > 0) {
+            $query .= " HAVING 1=1";
+            $hasPriceFilter = true;
+            
+            if ($precio_min > 0) {
+                $query .= " AND precio_desde >= :precio_min";
+            }
+            
+            if ($precio_max > 0) {
+                $query .= " AND precio_desde <= :precio_max";
+            }
         }
 
         $query .= " ORDER BY e.fechaInicio ASC";
@@ -92,12 +113,26 @@ class Evento {
             $stmt->bindParam(':tipo', $tipo);
         }
 
+        if (!empty($ubicacion)) {
+            $ubicacion_term = "%{$ubicacion}%";
+            $stmt->bindParam(':ubicacion', $ubicacion_term);
+        }
+
         if (!empty($fecha_desde)) {
             $stmt->bindParam(':fecha_desde', $fecha_desde);
         }
 
         if (!empty($fecha_hasta)) {
             $stmt->bindParam(':fecha_hasta', $fecha_hasta);
+        }
+
+        // NUEVO: Bind de parámetros de precio
+        if ($precio_min > 0) {
+            $stmt->bindParam(':precio_min', $precio_min, PDO::PARAM_INT);
+        }
+
+        if ($precio_max > 0) {
+            $stmt->bindParam(':precio_max', $precio_max, PDO::PARAM_INT);
         }
 
         $stmt->execute();

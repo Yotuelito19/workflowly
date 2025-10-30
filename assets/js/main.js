@@ -182,3 +182,48 @@ function preventMultipleSubmit(form) {
         submitBtn.textContent = 'Procesando...';
     }
 }
+
+// Permitir deseleccionar radio buttons al hacer clic nuevamente (para filtros)
+function initDeselectableRadioButtons() {
+    const radioButtons = document.querySelectorAll('input[type="radio"][name="tipo"]');
+    let lastChecked = null;
+
+    radioButtons.forEach(radio => {
+        radio.addEventListener('click', function(e) {
+            if (this === lastChecked) {
+                // Si se hace clic en el mismo radio que ya estaba seleccionado, lo deseleccionamos
+                this.checked = false;
+                lastChecked = null;
+                // Enviar el formulario para actualizar los resultados
+                this.form.submit();
+            } else {
+                lastChecked = this;
+            }
+        });
+
+        // Guardar el radio que está inicialmente seleccionado
+        if (radio.checked) {
+            lastChecked = radio;
+        }
+    });
+}
+
+// Resetear filtro de precio
+function resetPriceFilter() {
+    const precioMinInput = document.getElementById('precio_min');
+    const precioMaxInput = document.getElementById('precio_max');
+    
+    if (precioMinInput) precioMinInput.value = '';
+    if (precioMaxInput) precioMaxInput.value = '';
+    
+    // Enviar el formulario para actualizar los resultados
+    const form = precioMinInput ? precioMinInput.form : precioMaxInput.form;
+    if (form) {
+        form.submit();
+    }
+}
+
+// Inicializar radio buttons deseleccionables cuando el DOM esté listo
+document.addEventListener('DOMContentLoaded', function() {
+    initDeselectableRadioButtons();
+});

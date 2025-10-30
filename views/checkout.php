@@ -108,14 +108,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
-    <header class="header">
-        <div class="container">
-            <a href="../index.php" class="logo">
-                <div class="logo-circle"><span>W</span></div>
-                <span class="brand-name">WorkFlowly</span>
-            </a>
-        </div>
-    </header>
+    <!-- Header -->
+    <?php include __DIR__ . '/../includes/header.php'; ?>
 
     <main class="checkout-main">
         <div class="container">
@@ -209,5 +203,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
             </div>
         </div>
     </main>
+
+    <!-- Footer -->
+    <?php include __DIR__ . '/../includes/footer.php'; ?>
 </body>
 </html>

@@ -35,34 +35,7 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-brand">
-                <div class="logo">
-                    <div class="logo-circle">
-                        <span>W</span>
-                    </div>
-                    <span class="brand-name">WorkFlowly</span>
-                </div>
-            </div>
-            <nav class="nav-menu">
-                <a href="views/search-events.php">Eventos</a>
-                <a href="#como-funciona">Cómo funciona</a>
-                <?php if (is_organizer()): ?>
-                    <a href="views/account.php#mis-eventos">Mis Eventos</a>
-                <?php endif; ?>
-            </nav>
-            <div class="nav-actions">
-                <?php if (is_logged_in()): ?>
-                    <a href="views/account.php" class="btn-secondary">Mi Cuenta</a>
-                    <a href="api/logout.php" class="btn-primary">Cerrar Sesión</a>
-                <?php else: ?>
-                    <a href="views/login.php" class="btn-secondary">Iniciar Sesión</a>
-                    <a href="views/login.php" class="btn-primary">Registrarse</a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/../includes/header.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -79,7 +52,13 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                     </div>
                     <div class="search-field">
                         <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" name="ubicacion" placeholder="Ciudad">
+                        <select>
+                            <option>Todas las ciudades</option>
+                            <option>Madrid</option>
+                            <option>Barcelona</option>
+                            <option>Valencia</option>
+                            <option>Sevilla</option>
+                        </select>
                     </div>
                     <div class="search-field">
                         <i class="fas fa-calendar"></i>

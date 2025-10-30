@@ -35,34 +35,7 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
 </head>
 <body>
     <!-- Header -->
-    <header class="header">
-        <div class="container">
-            <div class="nav-brand">
-                <div class="logo">
-                    <div class="logo-circle">
-                        <span>W</span>
-                    </div>
-                    <span class="brand-name">WorkFlowly</span>
-                </div>
-            </div>
-            <nav class="nav-menu">
-                <a href="views/search-events.php">Eventos</a>
-                <a href="#como-funciona">Cómo funciona</a>
-                <?php if (is_organizer()): ?>
-                    <a href="views/account.php#mis-eventos">Mis Eventos</a>
-                <?php endif; ?>
-            </nav>
-            <div class="nav-actions">
-                <?php if (is_logged_in()): ?>
-                    <a href="views/account.php" class="btn-secondary">Mi Cuenta</a>
-                    <a href="api/logout.php" class="btn-primary">Cerrar Sesión</a>
-                <?php else: ?>
-                    <a href="views/login.php" class="btn-secondary">Iniciar Sesión</a>
-                    <a href="views/login.php" class="btn-primary">Registrarse</a>
-                <?php endif; ?>
-            </div>
-        </div>
-    </header>
+    <?php include __DIR__ . '/includes/header.php'; ?>
 
     <!-- Hero Section -->
     <section class="hero">
@@ -79,11 +52,19 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                     </div>
                     <div class="search-field">
                         <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" name="ubicacion" placeholder="Ciudad">
+                        <select name="ubicacion">
+                            <option value="">Todas las ciudades</option>
+                            <option value="Madrid">Madrid</option>
+                            <option value="Barcelona">Barcelona</option>
+                            <option value="Valencia">Valencia</option>
+                            <option value="Sevilla">Sevilla</option>
+                        </select>
                     </div>
-                    <div class="search-field">
+                    <div class="search-field date-range">
                         <i class="fas fa-calendar"></i>
-                        <input type="date" name="fecha_desde">
+                        <input type="date" name="fecha_desde" placeholder="Desde">
+                        <span class="date-separator">-</span>
+                        <input type="date" name="fecha_hasta" placeholder="Hasta">
                     </div>
                     <button type="submit" class="btn-search">Buscar Eventos</button>
                 </form>
@@ -111,13 +92,13 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                 $eventosHero = array_slice($eventos, 0, 3);
                 foreach ($eventosHero as $evento): 
                 ?>
-                    <div class="event-card">
+                    <a href="views/event-detail.php?id=<?php echo $evento['idEvento']; ?>" class="event-card">
                         <div class="event-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
                         <div class="event-info">
                             <h4><?php echo htmlspecialchars(substr($evento['nombre'], 0, 30)); ?></h4>
                             <p>Desde <?php echo format_price($evento['precio_desde'] ?? 25); ?></p>
                         </div>
-                    </div>
+                    </a>
                 <?php endforeach; ?>
             </div>
         </div>
@@ -223,50 +204,7 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
     </section>
 
     <!-- Footer -->
-    <footer class="footer">
-        <div class="container">
-            <div class="footer-content">
-                <div class="footer-section">
-                    <div class="logo">
-                        <div class="logo-circle">
-                            <span>W</span>
-                        </div>
-                        <span class="brand-name">WorkFlowly</span>
-                    </div>
-                    <p>Tu plataforma de confianza para comprar entradas sin reventa.</p>
-                </div>
-                <div class="footer-section">
-                    <h4>Enlaces útiles</h4>
-                    <ul>
-                        <li><a href="#">Sobre nosotros</a></li>
-                        <li><a href="#como-funciona">Cómo funciona</a></li>
-                        <li><a href="#">Ayuda</a></li>
-                        <li><a href="#">Contacto</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Legal</h4>
-                    <ul>
-                        <li><a href="#">Términos y condiciones</a></li>
-                        <li><a href="#">Política de privacidad</a></li>
-                        <li><a href="#">Política de cookies</a></li>
-                    </ul>
-                </div>
-                <div class="footer-section">
-                    <h4>Síguenos</h4>
-                    <div class="social-links">
-                        <a href="#"><i class="fab fa-facebook"></i></a>
-                        <a href="#"><i class="fab fa-twitter"></i></a>
-                        <a href="#"><i class="fab fa-instagram"></i></a>
-                        <a href="#"><i class="fab fa-linkedin"></i></a>
-                    </div>
-                </div>
-            </div>
-            <div class="footer-bottom">
-                <p>&copy; 2025 WorkFlowly. Todos los derechos reservados.</p>
-            </div>
-        </div>
-    </footer>
+    <?php include __DIR__ . '/includes/footer.php'; ?>
 
     <script src="assets/js/main.js"></script>
 </body>

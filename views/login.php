@@ -99,24 +99,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <title>Iniciar Sesión - WorkFlowly</title>
     <link rel="stylesheet" href="../assets/css/login.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        .alert {
-            padding: 12px 20px;
-            margin-bottom: 20px;
-            border-radius: 8px;
-            font-size: 14px;
-        }
-        .alert-error {
-            background: #fee;
-            color: #c00;
-            border: 1px solid #fcc;
-        }
-        .alert-success {
-            background: #efe;
-            color: #0a0;
-            border: 1px solid #cfc;
-        }
-    </style>
 </head>
 <body>
     <!-- Header -->
@@ -176,8 +158,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                             </div>
                         </div>
 
-                        <div class="trust-badges">
-                            <div class="badges-content">
+                        <div class="social-proof">
+                            <div class="proof-stats">
                                 <div class="stat">
                                     <strong>50K+</strong>
                                     <span>usuarios activos</span>
@@ -337,7 +319,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                         <i class="fas fa-eye"></i>
                                     </button>
                                 </div>
+                                <div class="password-strength" id="passwordStrength">
+                                    <div class="strength-bar">
+                                        <div class="strength-fill"></div>
+                                    </div>
+                                    <span class="strength-text">Introduce una contraseña</span>
+                                </div>
                             </div>
+
+                             
 
                             <div class="form-group">
                                 <label for="confirmPassword">Confirmar contraseña</label>
@@ -349,7 +339,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </button>
                                 </div>
                             </div>
-
+                            <div class="form-group">
+                                <label for="birthDate">Fecha de nacimiento</label>
+                                <div class="input-wrapper">
+                                    <i class="fas fa-calendar"></i>
+                                    <input type="date" id="birthDate" name="birthDate" required>
+                                </div>
+                                <small>Necesario para verificar edad en eventos</small>
+                            </div>
                             <div class="form-group">
                                 <label for="userType">Tipo de usuario</label>
                                 <div class="input-wrapper">
@@ -360,19 +357,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </select>
                                 </div>
                             </div>
-
-                            <div class="form-group">
-                                <label class="checkbox-label">
+                            <div class="form-options">
+                                <label class="checkbox-label required">
                                     <input type="checkbox" name="terms" required>
                                     <span class="checkmark"></span>
-                                    Acepto los <a href="#">términos y condiciones</a> y la <a href="#">política de privacidad</a>
+                                    Acepto los <a href="#" target="_blank">términos y condiciones</a>
+                                </label>
+                                <label class="checkbox-label required">
+                                    <input type="checkbox" name="privacy" required>
+                                    <span class="checkmark"></span>
+                                    Acepto la <a href="#" target="_blank">política de privacidad</a>
+                                </label>
+                                <label class="checkbox-label">
+                                    <input type="checkbox" name="newsletter">
+                                    <span class="checkmark"></span>
+                                    Quiero recibir ofertas y novedades por email
                                 </label>
                             </div>
-
                             <button type="submit" class="btn-primary">
                                 Crear cuenta
                                 <i class="fas fa-arrow-right"></i>
                             </button>
+                            <div class="divider">
+                                <span>O regístrate con</span>
+                            </div>
+
+                            <div class="social-login">
+                                <button type="button" class="btn-social google">
+                                    <i class="fab fa-google"></i>
+                                    Google
+                                </button>
+                                <button type="button" class="btn-social facebook">
+                                    <i class="fab fa-facebook-f"></i>
+                                    Facebook
+                                </button>
+                            </div>
 
                             <p class="form-switch">
                                 ¿Ya tienes cuenta? 
@@ -385,18 +404,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </main>
 
-    <!-- Footer -->
+   <!-- Footer -->
     <footer class="footer">
         <div class="container">
-            <p>&copy; 2025 WorkFlowly. Todos los derechos reservados.</p>
-            <div class="footer-links">
-                <a href="#">Términos de servicio</a>
-                <a href="#">Política de privacidad</a>
-                <a href="#">Ayuda</a>
+            <div class="footer-content">
+                <div class="footer-links">
+                    <a href="#">Ayuda</a>
+                    <a href="#">Contacto</a>
+                    <a href="#">Términos</a>
+                    <a href="#">Privacidad</a>
+                    <a href="#">Cookies</a>
+                </div>
+                <p>&copy; 2025 WorkFlowly. Todos los derechos reservados.</p>
             </div>
         </div>
     </footer>
-
     <script>
         // Toggle password visibility
         function togglePassword(inputId) {
@@ -413,6 +435,49 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 icon.classList.remove('fa-eye-slash');
                 icon.classList.add('fa-eye');
             }
+        }
+         // Password strength checker
+        const passwordInput = document.getElementById('registerPassword');
+        const strengthBar = document.querySelector('.strength-fill');
+        const strengthText = document.querySelector('.strength-text');
+
+        if (passwordInput) {
+            passwordInput.addEventListener('input', function() {
+                const password = this.value;
+                let strength = 0;
+                let text = '';
+                let color = '';
+
+                if (password.length === 0) {
+                    text = 'Introduce una contraseña';
+                    color = '#ccc';
+                } else if (password.length < 8) {
+                    strength = 25;
+                    text = 'Muy débil';
+                    color = '#FF6B6B';
+                } else {
+                    strength = 25;
+                    if (password.match(/[a-z]/)) strength += 25;
+                    if (password.match(/[A-Z]/)) strength += 25;
+                    if (password.match(/[0-9]/)) strength += 25;
+                    
+                    if (strength === 50) {
+                        text = 'Débil';
+                        color = '#FF9800';
+                    } else if (strength === 75) {
+                        text = 'Buena';
+                        color = '#4CAF50';
+                    } else if (strength === 100) {
+                        text = 'Muy fuerte';
+                        color = '#4CAF50';
+                    }
+                }
+
+                strengthBar.style.width = strength + '%';
+                strengthBar.style.backgroundColor = color;
+                strengthText.textContent = text;
+                strengthText.style.color = color;
+            });
         }
 
         // Show register form
