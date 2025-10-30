@@ -21,7 +21,7 @@ class Evento {
     public $imagenPrincipal;
     public $idEstadoEvento;
 
-    // 👇 NUEVO
+    //  NUEVO
     public $idLugar;
     public $idOrganizador;
 
@@ -55,7 +55,6 @@ class Evento {
 
     /**
      * Buscar eventos por filtros
-     * ACTUALIZADO: Incluye filtros de precio mínimo y máximo
      */
     public function buscarEventos($search = '', $tipo = '', $fecha_desde = '', $fecha_hasta = '', $ubicacion = '', $precio_min = 0, $precio_max = 0) {
         $query = "SELECT e.*, u.nombre as organizador_nombre, u.apellidos as organizador_apellidos,
@@ -88,11 +87,6 @@ class Evento {
             $query .= " AND DATE(e.fechaInicio) <= :fecha_hasta";
         }
 
-<<<<<<< HEAD
-        // NUEVO: Filtros de precio
-        // Se usa HAVING porque precio_desde es un campo calculado con subconsulta
-=======
->>>>>>> feature/unionTest
         $hasPriceFilter = false;
         if ($precio_min > 0 || $precio_max > 0) {
             $query .= " HAVING 1=1";
@@ -133,10 +127,6 @@ class Evento {
             $stmt->bindParam(':fecha_hasta', $fecha_hasta);
         }
 
-<<<<<<< HEAD
-        // NUEVO: Bind de parámetros de precio
-=======
->>>>>>> feature/unionTest
         if ($precio_min > 0) {
             $stmt->bindParam(':precio_min', $precio_min, PDO::PARAM_INT);
         }

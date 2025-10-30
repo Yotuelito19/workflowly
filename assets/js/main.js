@@ -226,9 +226,6 @@ function resetPriceFilter() {
 // Inicializar radio buttons deseleccionables cuando el DOM esté listo
 document.addEventListener('DOMContentLoaded', function() {
     initDeselectableRadioButtons();
-<<<<<<< HEAD
-});
-=======
 });
 
 async function cargarLugares() {
@@ -256,4 +253,3 @@ async function cargarOrganizadores() {
     sel.appendChild(opt);
   });
 }
->>>>>>> feature/unionTest
