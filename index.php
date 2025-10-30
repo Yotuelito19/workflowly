@@ -79,11 +79,19 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                     </div>
                     <div class="search-field">
                         <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" name="ubicacion" placeholder="Ciudad">
+                        <select name="ubicacion">
+                            <option value="">Todas las ciudades</option>
+                            <option value="Madrid">Madrid</option>
+                            <option value="Barcelona">Barcelona</option>
+                            <option value="Valencia">Valencia</option>
+                            <option value="Sevilla">Sevilla</option>
+                        </select>
                     </div>
-                    <div class="search-field">
+                    <div class="search-field date-range">
                         <i class="fas fa-calendar"></i>
-                        <input type="date" name="fecha_desde">
+                        <input type="date" name="fecha_desde" placeholder="Desde">
+                        <span class="date-separator">-</span>
+                        <input type="date" name="fecha_hasta" placeholder="Hasta">
                     </div>
                     <button type="submit" class="btn-search">Buscar Eventos</button>
                 </form>
@@ -111,13 +119,13 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                 $eventosHero = array_slice($eventos, 0, 3);
                 foreach ($eventosHero as $evento): 
                 ?>
-                    <div class="event-card">
+                    <a href="views/event-detail.php?id=<?php echo $evento['idEvento']; ?>" class="event-card">
                         <div class="event-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
                         <div class="event-info">
                             <h4><?php echo htmlspecialchars(substr($evento['nombre'], 0, 30)); ?></h4>
                             <p>Desde <?php echo format_price($evento['precio_desde'] ?? 25); ?></p>
                         </div>
-                    </div>
+                    </a>
                 <?php endforeach; ?>
             </div>
         </div>

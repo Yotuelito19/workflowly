@@ -79,7 +79,13 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                     </div>
                     <div class="search-field">
                         <i class="fas fa-map-marker-alt"></i>
-                        <input type="text" name="ubicacion" placeholder="Ciudad">
+                        <select>
+                            <option>Todas las ciudades</option>
+                            <option>Madrid</option>
+                            <option>Barcelona</option>
+                            <option>Valencia</option>
+                            <option>Sevilla</option>
+                        </select>
                     </div>
                     <div class="search-field">
                         <i class="fas fa-calendar"></i>

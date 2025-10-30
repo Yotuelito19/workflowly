@@ -247,6 +247,26 @@ body {
     color: var(--text-dark);
 }
 
+/* Rango de fechas */
+.search-field.date-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.search-field.date-range input[type="date"] {
+    flex: 1;
+    min-width: 0;
+}
+
+.date-separator {
+    color: var(--text-light);
+    font-weight: 500;
+    padding: 0 4px;
+    flex-shrink: 0;
+}
+
+
 .btn-search {
     background: var(--primary-color);
     color: var(--white);
@@ -307,6 +327,18 @@ body {
     box-shadow: var(--shadow-medium);
     width: 200px;
     transition: transform 0.3s ease;
+    display: block;
+    text-decoration: none;
+    color: inherit;
+    cursor: pointer;
+}
+
+.event-card:link,
+.event-card:visited,
+.event-card:hover,
+.event-card:active {
+    text-decoration: none;
+    color: inherit;
 }
 
 .event-card:nth-child(2) {
@@ -319,6 +351,15 @@ body {
 
 .event-card:hover {
     transform: translateY(-8px) scale(1.05);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+}
+
+.event-card:nth-child(2):hover {
+    transform: translateX(40px) translateY(-8px) scale(1.05);
+}
+
+.event-card:nth-child(3):hover {
+    transform: translateX(-20px) translateY(-8px) scale(1.05);
 }
 
 .event-image {
@@ -334,12 +375,17 @@ body {
     font-size: 14px;
     font-weight: 600;
     margin-bottom: 4px;
+    color: var(--text-dark);
 }
 
 .event-info p {
     font-size: 12px;
-    color: var(--primary-color);
+    color: var(--primary-color) !important;
     font-weight: 600;
+}
+
+.event-card .event-info p {
+    color: var(--primary-color) !important;
 }
 
 /* Secciones */

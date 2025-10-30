@@ -1,0 +1,196 @@
+/* ===========================
+   ADMIN PANEL — EVENT MANAGER
+   =========================== */
+
+/* Variables globales (hereda de tu tema principal) */
+:root {
+  --primary-color: #0078d7;
+  --secondary-color: #e86b1c;
+  --success-color: #27ae60;
+  --danger-color: #e74c3c;
+  --background-light: #f4f6f8;
+  --text-color: #222;
+  --border-radius: 10px;
+}
+
+/* ===== Reset base ===== */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  background: var(--background-light);
+  color: var(--text-color);
+}
+
+.admin-wrap {
+  max-width: 1100px;
+  margin: 32px auto;
+  padding: 24px;
+  background: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+h1, h2 {
+  margin-top: 0;
+  color: var(--primary-color);
+}
+
+/* ===== Formulario ===== */
+form {
+  margin-bottom: 32px;
+  background: #fafafa;
+  border: 1px solid #ddd;
+  padding: 16px;
+  border-radius: var(--border-radius);
+}
+
+form label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 6px;
+  color: #333;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+input[type="file"],
+select,
+textarea {
+  width: 100%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: var(--border-radius);
+  font-size: 15px;
+  background: #fff;
+  transition: border 0.2s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--primary-color);
+  outline: none;
+}
+
+/* Grids */
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.fila {
+  display: flex;
+  gap: 10px;
+  margin: 10px 0;
+}
+
+/* ===== Botones ===== */
+button,
+.btn {
+  border: none;
+  border-radius: var(--border-radius);
+  padding: 10px 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.2s, transform 0.1s;
+}
+
+button:hover {
+  opacity: 0.9;
+}
+
+button:active {
+  transform: scale(0.98);
+}
+
+.primary {
+  background: var(--primary-color);
+  color: #fff;
+}
+
+.danger {
+  background: var(--danger-color);
+  color: #fff;
+}
+
+.success {
+  background: var(--success-color);
+  color: #fff;
+}
+
+button#btn-reset {
+  background: #ccc;
+  color: #000;
+}
+
+/* ===== Tabla de eventos ===== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #fff;
+  border-radius: var(--border-radius);
+  overflow: hidden;
+}
+
+th {
+  background: var(--primary-color);
+  color: #fff;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+td {
+  padding: 10px;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover td {
+  background: #f9f9f9;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 768px) {
+  .grid-2 {
+    grid-template-columns: 1fr;
+  }
+
+  th, td {
+    font-size: 14px;
+  }
+
+  .admin-wrap {
+    padding: 16px;
+  }
+}
+
+/* ===== Mensajes ===== */
+.alert {
+  padding: 10px 14px;
+  border-radius: var(--border-radius);
+  margin-bottom: 14px;
+  font-weight: 600;
+}
+
+.alert-success {
+  background: rgba(39, 174, 96, 0.1);
+  color: var(--success-color);
+}
+
+.alert-error {
+  background: rgba(231, 76, 60, 0.1);
+  color: var(--danger-color);
+}
+
+/* ===== Botones dentro de tabla ===== */
+.actions {
+  display: flex;
+  gap: 8px;
+}
+
+.actions button {
+  font-size: 14px;
+  padding: 6px 10px;
+}

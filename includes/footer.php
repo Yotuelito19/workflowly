@@ -3,15 +3,21 @@
  * Footer compartido de la aplicación
  */
 ?>
-<footer class="main-footer">
-    <div class="container footer-content">
-        <div class="footer-section">
-            <h3>WorkFlowly</h3>
-            <p>Tu plataforma de confianza para comprar entradas a los mejores eventos.</p>
-        </div>
+ <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <div class="logo">
+                        <div class="logo-circle">
+                            <span>W</span>
+                        </div>
+                        <span class="brand-name">WorkFlowly</span>
+                    </div>
+                    <p>Tu plataforma de confianza para comprar entradas sin reventa.</p>
+                </div>
 
         <div class="footer-section">
-            <h4>Enlaces rápidos</h4>
+            <h4>Enlaces</h4>
             <ul>
                 <li><a href="<?php echo BASE_URL; ?>/index.php">Inicio</a></li>
                 <li><a href="<?php echo BASE_URL; ?>/views/search-events.php">Buscar Eventos</a></li>
@@ -32,17 +38,17 @@
         <div class="footer-section">
             <h4>Síguenos</h4>
             <div class="social-links">
-                <a href="#" aria-label="Facebook">📘</a>
-                <a href="#" aria-label="Twitter">🐦</a>
-                <a href="#" aria-label="Instagram">📷</a>
-                <a href="#" aria-label="LinkedIn">💼</a>
+                <a href="#"><i class="fab fa-facebook"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-linkedin"></i></a>
             </div>
         </div>
     </div>
 
     <div class="footer-bottom">
-        <div class="container">
+        
             <p>&copy; <?php echo date('Y'); ?> WorkFlowly. Todos los derechos reservados.</p>
-        </div>
+        
     </div>
 </footer>
