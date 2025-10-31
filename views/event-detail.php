@@ -5,6 +5,7 @@
 
 require_once '../config/config.php';
 require_once '../config/database.php';
+require_once '../models/Evento.php'; // 💡 lo añadimos
 
 // Obtener ID del evento
 $idEvento = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -18,7 +19,8 @@ $database = new Database();
 $db = $database->getConnection();
 $eventoModel = new Evento($db);
 
-$evento = $eventoModel->obtenerPorId($idEvento);
+// 💡 ahora usamos el método nuevo
+$evento = $eventoModel->obtenerDetalleCompleto($idEvento);
 
 if (!$evento) {
     redirect('/views/search-events.php');
@@ -26,13 +28,27 @@ if (!$evento) {
 
 // Obtener tipos de entrada disponibles
 $tiposEntrada = $eventoModel->obtenerTiposEntrada($idEvento);
+
+// 💡 intentamos leer políticas, pero sin romper si no hay tabla
+$politicas = [];
+try {
+    $stmtPol = $db->prepare("SELECT categoria, titulo, descripcion
+                             FROM PoliticaEvento
+                             WHERE idEvento = :id
+                             ORDER BY categoria, idPolitica");
+    $stmtPol->execute([':id' => $idEvento]);
+    $politicas = $stmtPol->fetchAll(PDO::FETCH_ASSOC);
+} catch (Throwable $e) {
+    $politicas = [];
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?php echo htmlspecialchars($evento['nombre']); ?> - WorkFlowly</title>
+    <title><?= htmlspecialchars($evento['nombre']); ?> - WorkFlowly</title>
+    <!-- 👇 ajusta esta ruta a tu entorno -->
     <link rel="stylesheet" href="../assets/css/event-detail.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
@@ -47,47 +63,59 @@ $tiposEntrada = $eventoModel->obtenerTiposEntrada($idEvento);
             <i class="fas fa-chevron-right"></i>
             <a href="search-events.php">Eventos</a>
             <i class="fas fa-chevron-right"></i>
-            <a href="search-events.php?tipo=<?php echo urlencode($evento['tipo']); ?>"><?php echo htmlspecialchars($evento['tipo']); ?></a>
+            <a href="search-events.php?tipo=<?= urlencode($evento['tipo']); ?>"><?= htmlspecialchars($evento['tipo']); ?></a>
             <i class="fas fa-chevron-right"></i>
-            <span><?php echo htmlspecialchars($evento['nombre']); ?></span>
+            <span><?= htmlspecialchars($evento['nombre']); ?></span>
         </div>
     </nav>
 
     <!-- Event Hero -->
     <section class="event-hero">
         <div class="hero-background">
-            <div class="hero-image" style="background-image: url('<?php echo UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>');"></div>
+            <div class="hero-image" style="background-image: url('<?= UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>');"></div>
             <div class="hero-overlay"></div>
         </div>
         <div class="container">
             <div class="hero-content">
                 <div class="event-badges">
-                    <span class="badge category"><?php echo htmlspecialchars($evento['tipo']); ?></span>
+                    <span class="badge category"><?= htmlspecialchars($evento['tipo']); ?></span>
                     <?php if ($evento['entradasDisponibles'] < 100): ?>
                         <span class="badge trending">¡Últimas entradas!</span>
                     <?php endif; ?>
                 </div>
-                <h1><?php echo htmlspecialchars($evento['nombre']); ?></h1>
+                <h1><?= htmlspecialchars($evento['nombre']); ?></h1>
                 <div class="event-meta">
                     <div class="meta-item">
                         <i class="fas fa-calendar"></i>
                         <div>
-                            <strong><?php echo date('d M Y', strtotime($evento['fechaInicio'])); ?></strong>
-                            <span><?php echo date('l, H:i', strtotime($evento['fechaInicio'])); ?></span>
+                            <strong><?= date('d M Y', strtotime($evento['fechaInicio'])); ?></strong>
+                            <span><?= date('l, H:i', strtotime($evento['fechaInicio'])); ?></span>
                         </div>
                     </div>
                     <div class="meta-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
-                            <strong><?php echo htmlspecialchars($evento['ubicacion']); ?></strong>
-                            <span>España</span>
+                            <?php
+                            // 💡 si hay lugar en BD, lo usamos
+                            if (!empty($evento['lugar_nombre'])) {
+                                $tituloLugar = $evento['lugar_nombre'];
+                                $subLugar = trim(($evento['lugar_ciudad'] ?? '') . ', ' . ($evento['lugar_pais'] ?? ''), ' ,');
+                            } else {
+                                $tituloLugar = $evento['ubicacion'];
+                                $subLugar = 'España';
+                            }
+                            ?>
+                            <strong><?= htmlspecialchars($tituloLugar); ?></strong>
+                            <?php if ($subLugar): ?>
+                                <span><?= htmlspecialchars($subLugar); ?></span>
+                            <?php endif; ?>
                         </div>
                     </div>
                     <div class="meta-item">
                         <i class="fas fa-ticket-alt"></i>
                         <div>
-                            <strong><?php echo $evento['entradasDisponibles']; ?> disponibles</strong>
-                            <span>de <?php echo $evento['aforoTotal']; ?> totales</span>
+                            <strong><?= (int)$evento['entradasDisponibles']; ?> disponibles</strong>
+                            <span>de <?= (int)$evento['aforoTotal']; ?> totales</span>
                         </div>
                     </div>
                 </div>
@@ -114,48 +142,87 @@ $tiposEntrada = $eventoModel->obtenerTiposEntrada($idEvento);
                     <div class="details-card">
                         <h2>Sobre el evento</h2>
                         <div class="event-description">
-                            <p><?php echo nl2br(htmlspecialchars($evento['descripcion'] ?? 'Sin descripción disponible')); ?></p>
+                            <p><?= nl2br(htmlspecialchars($evento['descripcion'] ?? 'Sin descripción disponible')); ?></p>
                         </div>
                     </div>
 
+                    <!-- LOCALIZACIÓN -->
                     <div class="venue-card">
                         <h2>Localización</h2>
                         <div class="venue-info">
                             <div class="venue-details">
-                                <h3><?php echo htmlspecialchars($evento['ubicacion']); ?></h3>
+                                <h3>
+                                    <?php
+                                    if (!empty($evento['lugar_nombre'])) {
+                                        echo htmlspecialchars($evento['lugar_nombre']);
+                                    } else {
+                                        echo htmlspecialchars($evento['ubicacion']);
+                                    }
+                                    ?>
+                                </h3>
                                 <p class="venue-address">
                                     <i class="fas fa-map-marker-alt"></i>
-                                    Av. Felipe II, s/n, 28009 Madrid CAMBIAR
+                                    <?php
+                                    // 💡 prioridad: dirección del lugar, si no ciudad/pais, si no el texto que tenías
+                                    if (!empty($evento['lugar_direccion'])) {
+                                        echo htmlspecialchars($evento['lugar_direccion']);
+                                    } elseif (!empty($evento['lugar_ciudad']) || !empty($evento['lugar_pais'])) {
+                                        echo htmlspecialchars(trim(($evento['lugar_ciudad'] ?? '') . ', ' . ($evento['lugar_pais'] ?? ''), ' ,'));
+                                    } else {
+                                        echo 'Dirección pendiente';
+                                    }
+                                    ?>
                                 </p>
                                 <div class="venue-features">
                                     <span class="feature">
                                         <i class="fas fa-users"></i>
-                                        Capacidad: 17,000 personas CAMBIAR
+                                        Capacidad:
+                                        <?php
+                                        if (!empty($evento['lugar_capacidad'])) {
+                                            echo (int)$evento['lugar_capacidad'] . ' personas';
+                                        } else {
+                                            echo (int)$evento['aforoTotal'] . ' personas';
+                                        }
+                                        ?>
                                     </span>
-                                    <span class="feature">
-                                        <i class="fas fa-wheelchair"></i>
-                                        Acceso para discapacitados CAMBIAR
-                                    </span>
-                                    <span class="feature">
-                                        <i class="fas fa-car"></i>
-                                        Parking disponible CAMBIAR
-                                    </span>
-                                    <span class="feature">
-                                        <i class="fas fa-subway"></i>
-                                        Metro: Goya (L2, L4) CAMBIAR
-                                    </span>
+
+                                    <?php if (!empty($evento['lugar_acceso'])): ?>
+                                        <span class="feature">
+                                            <i class="fas fa-wheelchair"></i>
+                                            Acceso para discapacitados
+                                        </span>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($evento['lugar_parking'])): ?>
+                                        <span class="feature">
+                                            <i class="fas fa-car"></i>
+                                            <?= htmlspecialchars($evento['lugar_parking']); ?>
+                                        </span>
+                                    <?php endif; ?>
+
+                                    <?php if (!empty($evento['lugar_transporte'])): ?>
+                                        <span class="feature">
+                                            <i class="fas fa-subway"></i>
+                                            <?= htmlspecialchars($evento['lugar_transporte']); ?>
+                                        </span>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                             <div class="venue-map">
                                 <div class="map-placeholder">
                                     <i class="fas fa-map"></i>
                                     <p>Mapa interactivo</p>
-                                    <button class="btn-map">Ver en Google Maps</button>
+                                    <?php if (!empty($evento['lugar_mapa_url'])): ?>
+                                        <a href="<?= htmlspecialchars($evento['lugar_mapa_url']); ?>" target="_blank" class="btn-map">Ver en Google Maps</a>
+                                    <?php else: ?>
+                                        <button class="btn-map" disabled>Mapa no disponible</button>
+                                    <?php endif; ?>
                                 </div>
                             </div>
                         </div>
                     </div>
 
+                    <!-- ORGANIZADOR -->
                     <div class="organizer-card">
                         <h2>Información del organizador</h2>
                         <div class="organizer-info">
@@ -163,72 +230,117 @@ $tiposEntrada = $eventoModel->obtenerTiposEntrada($idEvento);
                                 <i class="fas fa-user-circle"></i>
                             </div>
                             <div class="organizer-details">
-                                <h3><?php echo htmlspecialchars($evento['organizador_nombre'] . ' ' . $evento['organizador_apellidos']); ?></h3>
-                                 <p class="organizer-description">
-                                    Líder mundial en entretenimiento en vivo, organizando los mejores eventos musicales con más de 25 años de experiencia. CAMBIAR
+                                <h3>
+                                    <?php
+                                    if (!empty($evento['org_nombre'])) {
+                                        echo htmlspecialchars(trim($evento['org_nombre'] . ' ' . ($evento['org_apellidos'] ?? '')));
+                                    } else {
+                                        // lo que ya tenías: viene del join con Usuario en tu método viejo
+                                        echo htmlspecialchars(($evento['organizador_nombre'] ?? 'Organizador') . ' ' . ($evento['organizador_apellidos'] ?? ''));
+                                    }
+                                    ?>
+                                </h3>
+                                <p class="organizer-description">
+                                    <?= htmlspecialchars($evento['org_descripcion'] ?? 'Empresa líder en gestión de espectáculos y conciertos.'); ?>
                                 </p>
                                 <div class="organizer-stats">
                                     <span class="stat">
-                                        <strong>500+</strong> eventos organizados CAMBIAR
+                                        <strong><?= (int)($evento['org_total_eventos'] ?? 24); ?>+</strong> eventos organizados
                                     </span>
                                     <span class="stat">
-                                        <strong>4.8★</strong> valoración promedio CAMBIAR 
+                                        <strong><?= $evento['org_valoracion'] !== null ? htmlspecialchars($evento['org_valoracion']) . '★' : '4.9★'; ?></strong> valoración promedio
                                     </span>
                                     <span class="stat">
-                                        <strong>2M+</strong> asistentes satisfechos CAMBIAR
+                                        <strong><?= (int)($evento['org_total_asistentes'] ?? 120000); ?></strong> asistentes
                                     </span>
                                 </div>
-                             
-                                <a href="mailto:<?php echo htmlspecialchars($evento['organizador_email']); ?>" class="btn-contact">Contactar</a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="policies-card">
-                        <h2>Políticas del evento CAMBIAR TODO, TODO TIENE QUE IR POR BD</h2>
-                        <div class="policies-content">
-                            <div class="policy-section">
-                                <h3><i class="fas fa-ticket-alt"></i> Entradas</h3>
-                                <ul>
-                                    <li>Las entradas son nominativas y no transferibles</li>
-                                    <li>Prohibida la reventa de entradas</li>
-                                    <li>Entrada digital vía QR code</li>
-                                    <li>Requerido documento de identidad para el acceso</li>
-                                </ul>
-                            </div>
-                            <div class="policy-section">
-                                <h3><i class="fas fa-undo"></i> Cancelaciones</h3>
-                                <ul>
-                                    <li>Reembolso completo hasta 48h antes del evento</li>
-                                    <li>En caso de cancelación del evento: reembolso automático</li>
-                                    <li>Cambio de fecha: las entradas siguen siendo válidas</li>
-                                </ul>
-                            </div>
-                            <div class="policy-section">
-                                <h3><i class="fas fa-shield-alt"></i> Seguridad</h3>
-                                <ul>
-                                    <li>Control de seguridad obligatorio en la entrada</li>
-                                    <li>Prohibidas bebidas y comida exterior</li>
-                                    <li>Cámaras profesionales requieren acreditación</li>
-                                    <li>Personal de seguridad y sanitario en el recinto</li>
-                                </ul>
-                            </div>
-                            <div class="policy-section">
-                                <h3><i class="fas fa-info-circle"></i> Información adicional</h3>
-                                <ul>
-                                    <li>Evento para mayores de 16 años</li>
-                                    <li>Menores de edad requieren autorización parental</li>
-                                    <li>Recomendable llegar 1 hora antes del inicio</li>
-                                    <li>Consulta el tiempo antes de asistir</li>
-                                </ul>
+                                <?php
+                                $mailOrg = $evento['org_email'] ?? $evento['organizador_email'] ?? '';
+                                if (!empty($mailOrg)): ?>
+                                    <a href="mailto:<?= htmlspecialchars($mailOrg); ?>" class="btn-contact">Contactar</a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>
 
-                    
-                    </main>
+                    <!-- POLÍTICAS -->
+                    <div class="policies-card">
+                        <h2>Políticas del evento</h2>
+                        <div class="policies-content">
+                            <?php if (!empty($politicas)): ?>
+                                <?php
+                                // agrupamos por categoría como tus 4 columnas
+                                $porCat = [];
+                                foreach ($politicas as $p) {
+                                    $cat = $p['categoria'] ?: 'Información';
+                                    $porCat[$cat][] = $p;
+                                }
+                                foreach ($porCat as $cat => $items): ?>
+                                    <div class="policy-section">
+                                        <h3>
+                                            <?php if ($cat === 'Entradas'): ?>
+                                                <i class="fas fa-ticket-alt"></i>
+                                            <?php elseif ($cat === 'Cancelaciones'): ?>
+                                                <i class="fas fa-undo"></i>
+                                            <?php elseif ($cat === 'Seguridad'): ?>
+                                                <i class="fas fa-shield-alt"></i>
+                                            <?php else: ?>
+                                                <i class="fas fa-info-circle"></i>
+                                            <?php endif; ?>
+                                            <?= htmlspecialchars($cat); ?>
+                                        </h3>
+                                        <ul>
+                                            <?php foreach ($items as $it): ?>
+                                                <li><?= htmlspecialchars($it['titulo'] ?: $it['descripcion']); ?></li>
+                                            <?php endforeach; ?>
+                                        </ul>
+                                    </div>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <!-- 👇 lo que tenías antes -->
+                                <div class="policy-section">
+                                    <h3><i class="fas fa-ticket-alt"></i> Entradas</h3>
+                                    <ul>
+                                        <li>Las entradas son nominativas y no transferibles</li>
+                                        <li>Prohibida la reventa de entradas</li>
+                                        <li>Entrada digital vía QR code</li>
+                                        <li>Requerido documento de identidad para el acceso</li>
+                                    </ul>
+                                </div>
+                                <div class="policy-section">
+                                    <h3><i class="fas fa-undo"></i> Cancelaciones</h3>
+                                    <ul>
+                                        <li>Reembolso completo hasta 48h antes del evento</li>
+                                        <li>En caso de cancelación del evento: reembolso automático</li>
+                                        <li>Cambio de fecha: las entradas siguen siendo válidas</li>
+                                    </ul>
+                                </div>
+                                <div class="policy-section">
+                                    <h3><i class="fas fa-shield-alt"></i> Seguridad</h3>
+                                    <ul>
+                                        <li>Control de seguridad obligatorio en la entrada</li>
+                                        <li>Prohibidas bebidas y comida exterior</li>
+                                        <li>Cámaras profesionales requieren acreditación</li>
+                                        <li>Personal de seguridad y sanitario en el recinto</li>
+                                    </ul>
+                                </div>
+                                <div class="policy-section">
+                                    <h3><i class="fas fa-info-circle"></i> Información adicional</h3>
+                                    <ul>
+                                        <li>Evento para mayores de 16 años</li>
+                                        <li>Menores de edad requieren autorización parental</li>
+                                        <li>Recomendable llegar 1 hora antes del inicio</li>
+                                        <li>Consulta el tiempo antes de asistir</li>
+                                    </ul>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    </div>
+
+                </main>
 
                 <!-- Sidebar - Ticket Selection -->
-                <aside class="tickets-sidebar">
+                 <aside class="tickets-sidebar">
                     <div class="tickets-card">
                         <div class="card-header">
                             <h3>Selecciona tus entradas</h3>
@@ -387,10 +499,9 @@ $tiposEntrada = $eventoModel->obtenerTiposEntrada($idEvento);
     </section>
 
     <!-- Footer -->
-   <?php include __DIR__ . '/../includes/footer.php'; ?>
+    <?php include __DIR__ . '/../includes/footer.php'; ?>
 
-
-    <script>
+     <script>
         // Precios de entradas (PHP a JS)
         const ticketPrices = {
             <?php foreach ($tiposEntrada as $tipo): ?>

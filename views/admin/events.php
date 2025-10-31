@@ -143,6 +143,7 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
       </tbody>
     </table>
   </div>
+<script src="../../assets/js/main.js"></script>
 
 <script>
 // --- Helpers JS ---
@@ -281,6 +282,13 @@ $form.addEventListener('submit', async (e) => {
   }
   location.reload();
 });
+
+// Cargar combos al entrar en la página (modo crear)
+document.addEventListener('DOMContentLoaded', async () => {
+  await cargarLugares();
+  await cargarOrganizadores();
+});
+
 
 
 </script>

@@ -316,5 +316,46 @@ class Evento {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function obtenerDetalleCompleto(int $idEvento)
+{
+    $sql = "SELECT 
+                e.*,
+                -- Lugar (puede ser null)
+                l.idLugar,
+                l.nombre            AS lugar_nombre,
+                l.direccion         AS lugar_direccion,
+                l.ciudad            AS lugar_ciudad,
+                l.pais              AS lugar_pais,
+                l.capacidad         AS lugar_capacidad,
+                l.accesoDiscapacitados AS lugar_acceso,
+                l.parking           AS lugar_parking,
+                l.transportePublico AS lugar_transporte,
+                l.mapaUrl           AS lugar_mapa_url,
+                -- Organizador (puede ser null)
+                o.idOrganizador,
+                o.descripcion       AS org_descripcion,
+                o.totalEventos      AS org_total_eventos,
+                o.totalAsistentes   AS org_total_asistentes,
+                o.valoracionPromedio AS org_valoracion,
+                uo.nombre           AS org_nombre,
+                uo.apellidos        AS org_apellidos,
+                uo.email            AS org_email
+            FROM Evento e
+            LEFT JOIN Lugar l
+                ON e.idLugar = l.idLugar
+            LEFT JOIN Organizador o
+                ON e.idOrganizador = o.idOrganizador
+            LEFT JOIN Usuario uo
+                ON o.idUsuario = uo.idUsuario
+            WHERE e.idEvento = :id
+            LIMIT 1";
+    $stmt = $this->conn->prepare($sql);
+    $stmt->bindValue(':id', $idEvento, PDO::PARAM_INT);
+    $stmt->execute();
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+
+
 }
 ?>
