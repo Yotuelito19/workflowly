@@ -136,69 +136,89 @@ class Compra {
 
     /**
      * Obtener compras de un usuario
+     * Cambios realizados
      */
     public function obtenerComprasUsuario($idUsuario) {
-        $query = "SELECT c.*, mp.nombre as metodo_pago, est.nombre as estado_compra,
-                         COUNT(DISTINCT dc.idDetalleCompra) as num_detalles,
-                         COUNT(DISTINCT e.idEntrada) as num_entradas
-                  FROM " . $this->table_name . " c
-                  INNER JOIN MetodoPago mp ON c.idMetodoPago = mp.idMetodoPago
-                  INNER JOIN Estado est ON c.idEstadoCompra = est.idEstado
-                  LEFT JOIN DetalleCompra dc ON c.idCompra = dc.idCompra
-                  LEFT JOIN Entrada e ON dc.idDetalleCompra = e.idDetalleCompra
-                  WHERE c.idUsuario = :idUsuario
-                  GROUP BY c.idCompra
-                  ORDER BY c.fechaCompra DESC";
+    $query = "SELECT c.*, 
+                     mp.tipo as metodo_pago, 
+                     est.nombre as estado_compra,
+                     COUNT(DISTINCT dc.idDetalleCompra) as num_detalles,
+                     COUNT(DISTINCT e.idEntrada) as num_entradas
+              FROM " . $this->table_name . " c
+              INNER JOIN MetodoPago mp ON c.idMetodoPago = mp.idMetodoPago
+              INNER JOIN Estado est ON c.idEstadoCompra = est.idEstado
+              LEFT JOIN DetalleCompra dc ON c.idCompra = dc.idCompra
+              LEFT JOIN Entrada e ON dc.idDetalleCompra = e.idDetalleCompra
+              WHERE c.idUsuario = :idUsuario
+              GROUP BY c.idCompra
+              ORDER BY c.fechaCompra DESC";
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':idUsuario', $idUsuario);
-        $stmt->execute();
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':idUsuario', $idUsuario);
+    $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     /**
      * Obtener detalles de una compra
+     * Cambios realizados
      */
     public function obtenerDetalles($idCompra) {
-        $query = "SELECT dc.*, te.nombre as tipo_entrada_nombre, te.descripcion as tipo_entrada_desc,
-                         ev.nombre as evento_nombre, ev.fechaInicio, ev.fechaFin, ev.ubicacion,
-                         z.nombre as zona_nombre
-                  FROM DetalleCompra dc
-                  INNER JOIN TipoEntrada te ON dc.idTipoEntrada = te.idTipoEntrada
-                  INNER JOIN Evento ev ON te.idEvento = ev.idEvento
-                  LEFT JOIN Zona z ON te.idZona = z.idZona
-                  WHERE dc.idCompra = :idCompra";
+    $query = "SELECT dc.*, 
+                     te.nombre as tipo_entrada_nombre, 
+                     te.descripcion as tipo_entrada_desc,
+                     ev.nombre as evento_nombre, 
+                     ev.fechaInicio, 
+                     ev.fechaFin, 
+                     ev.ubicacion,
+                     GROUP_CONCAT(DISTINCT z.nombre SEPARATOR ', ') as zona_nombre
+              FROM DetalleCompra dc
+              INNER JOIN TipoEntrada te ON dc.idTipoEntrada = te.idTipoEntrada
+              INNER JOIN Evento ev ON te.idEvento = ev.idEvento
+              LEFT JOIN TipoEntradaZona tez ON te.idTipoEntrada = tez.idTipoEntrada
+              LEFT JOIN Zona z ON tez.idZona = z.idZona
+              WHERE dc.idCompra = :idCompra
+              GROUP BY dc.idDetalleCompra";
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':idCompra', $idCompra);
-        $stmt->execute();
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':idCompra', $idCompra);
+    $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
     /**
      * Obtener entradas de un usuario
+     * Cambios realizados
      */
     public function obtenerEntradasUsuario($idUsuario) {
-        $query = "SELECT e.*, ev.nombre as evento_nombre, ev.fechaInicio, ev.fechaFin, ev.ubicacion, ev.imagenPrincipal,
-                         te.nombre as tipo_entrada_nombre, z.nombre as zona_nombre,
-                         est.nombre as estado_entrada
-                  FROM Entrada e
-                  INNER JOIN DetalleCompra dc ON e.idDetalleCompra = dc.idDetalleCompra
-                  INNER JOIN Compra c ON dc.idCompra = c.idCompra
-                  INNER JOIN TipoEntrada te ON dc.idTipoEntrada = te.idTipoEntrada
-                  INNER JOIN Evento ev ON te.idEvento = ev.idEvento
-                  LEFT JOIN Zona z ON te.idZona = z.idZona
-                  INNER JOIN Estado est ON e.idEstadoEntrada = est.idEstado
-                  WHERE c.idUsuario = :idUsuario
-                  ORDER BY ev.fechaInicio DESC";
+    $query = "SELECT e.*, 
+                     ev.nombre as evento_nombre, 
+                     ev.fechaInicio, 
+                     ev.fechaFin, 
+                     ev.ubicacion, 
+                     ev.imagenPrincipal,
+                     te.nombre as tipo_entrada_nombre,
+                     est.nombre as estado_entrada,
+                     GROUP_CONCAT(DISTINCT z.nombre SEPARATOR ', ') as zona_nombre
+              FROM Entrada e
+              INNER JOIN DetalleCompra dc ON e.idDetalleCompra = dc.idDetalleCompra
+              INNER JOIN Compra c ON dc.idCompra = c.idCompra
+              INNER JOIN TipoEntrada te ON dc.idTipoEntrada = te.idTipoEntrada
+              INNER JOIN Evento ev ON te.idEvento = ev.idEvento
+              INNER JOIN Estado est ON e.idEstadoEntrada = est.idEstado
+              LEFT JOIN TipoEntradaZona tez ON te.idTipoEntrada = tez.idTipoEntrada
+              LEFT JOIN Zona z ON tez.idZona = z.idZona
+              WHERE c.idUsuario = :idUsuario
+              GROUP BY e.idEntrada
+              ORDER BY ev.fechaInicio DESC";
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':idUsuario', $idUsuario);
-        $stmt->execute();
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(':idUsuario', $idUsuario);
+    $stmt->execute();
 
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 }
 ?>

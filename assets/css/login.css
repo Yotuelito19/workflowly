@@ -815,3 +815,81 @@ body {
     border-color: var(--error-color);
     box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
 }
+.alert {
+        padding: 12px 20px;
+        margin-bottom: 20px;
+        border-radius: 8px;
+        font-size: 14px;
+    }
+.alert-error {
+        background: #fee;
+        color: #c00;
+        border: 1px solid #fcc;
+    }
+.alert-success {
+        background: #efe;
+        color: #0a0;
+        border: 1px solid #cfc;
+    }
+    /* Select "Tipo de usuario" */
+.input-wrapper select {
+    width: 100%;
+    padding: 14px 48px 14px 48px; /* mismo padding que los inputs (icono a la izquierda y flecha a la derecha) */
+    border: 2px solid var(--gray-300);
+    border-radius: var(--border-radius-small);
+    font-size: 14px;
+    font-family: var(--font-primary);
+    background: var(--white);
+    transition: all 0.3s ease;
+
+    /* quitar estilos nativos y poner flecha custom */
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236C757D' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><polyline points='6 9 12 15 18 9'/></svg>");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    background-size: 14px 14px;
+}
+
+.input-wrapper select:focus {
+    outline: none;
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+}
+
+/* colorear el icono de la izquierda cuando el select tiene focus */
+.input-wrapper:has(select:focus) i {
+    color: var(--primary-color);
+}
+
+/* estado hover (opcional) */
+.input-wrapper select:hover {
+    border-color: var(--gray-400);
+}
+
+/* placeholder/option deshabilitada (si la usas) */
+.input-wrapper select:invalid {
+    color: var(--gray-500);
+}
+
+/* disabled y error para coherencia con tus inputs */
+.input-wrapper select:disabled {
+    background-color: var(--gray-100);
+    color: var(--gray-500);
+    cursor: not-allowed;
+}
+
+.input-wrapper select.error {
+    border-color: var(--error-color);
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+/* Ajuste responsive como tus inputs en móvil */
+@media (max-width: 480px) {
+    .input-wrapper select {
+        padding: 12px 44px 12px 44px;
+        background-position: right 14px center;
+        background-size: 12px 12px;
+    }
+}

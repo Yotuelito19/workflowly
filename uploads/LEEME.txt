@@ -1,0 +1,5 @@
+Aquí subiremos imágenes dinámicas que queramos usar como:
+Fotos de eventos (subidas por organizadores)
+- Avatares de usuarios
+- Documentos adjuntos
+- Cualquier contenido generado por usuarios

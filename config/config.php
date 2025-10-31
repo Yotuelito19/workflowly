@@ -88,6 +88,13 @@ function is_logged_in() {
 function is_organizer() {
     return is_logged_in() && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'Organizador';
 }
+/**
+ * Función para verificar si el usuario es administrador
+ */
+function is_admin() {
+    return is_logged_in() && isset($_SESSION['user_type']) && $_SESSION['user_type'] === 'Admin';
+}
+
 
 /**
  * Función para redirigir
@@ -125,4 +132,57 @@ function format_date($date) {
     return date('d/m/Y H:i', strtotime($date));
 }
 
-?>
+// ===================================================================
+// === Helpers JSON globales y manejador de errores fatal-only ====
+// ===================================================================
+
+// Evitar doble instalación
+if (!defined('JSON_HELPERS_INSTALLED')) {
+    define('JSON_HELPERS_INSTALLED', true);
+
+    /**
+     * Devuelve respuesta JSON de éxito y termina ejecución
+     */
+    function json_success(array $payload, int $status = 200): void {
+        if (ob_get_length()) ob_end_clean();
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode($payload, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    /**
+     * Devuelve respuesta JSON de error y termina ejecución
+     */
+    function json_error(string $msg, int $status = 400, array $extra = []): void {
+        if (ob_get_length()) ob_end_clean();
+        http_response_code($status);
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => false, 'error' => $msg] + $extra, JSON_UNESCAPED_UNICODE);
+        exit;
+    }
+
+    /**
+     * Manejador global para errores fatales (no interfiere con respuestas válidas)
+     */
+    set_error_handler(function ($severity, $message, $file, $line) {
+        throw new ErrorException($message, 0, $severity, $file, $line);
+    });
+
+    register_shutdown_function(function () {
+        $err = error_get_last();
+        if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
+            if (ob_get_length()) ob_end_clean();
+            http_response_code(500);
+            header('Content-Type: application/json; charset=utf-8');
+            echo json_encode([
+                'ok' => false,
+                'error' => 'Fatal error',
+                'detail' => $err['message'] . ' @ ' . $err['file'] . ':' . $err['line']
+            ], JSON_UNESCAPED_UNICODE);
+        } else {
+            if (ob_get_length()) ob_end_flush();
+        }
+    });
+}
+

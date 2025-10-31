@@ -8,7 +8,7 @@ class Database {
     private $host = "localhost";
     private $db_name = "workflowly";
     private $username = "root";
-    private $password = "";
+    private $password = "WorkFlowly";
     private $charset = "utf8mb4";
     public $conn;
 
