@@ -40,10 +40,7 @@ $fecha_desde = isset($_GET['fecha_desde']) ? sanitize_input($_GET['fecha_desde']
 $fecha_hasta = isset($_GET['fecha_hasta']) ? sanitize_input($_GET['fecha_hasta']) : '';
 $precio_min = isset($_GET['precio_min']) ? (int)$_GET['precio_min'] : 0;
 $precio_max = isset($_GET['precio_max']) ? (int)$_GET['precio_max'] : 0;
-<<<<<<< HEAD
-=======
 $orden = isset($_GET['orden']) ? sanitize_input($_GET['orden']) : 'fecha_asc';
->>>>>>> feature/test-navigation.html
 
 // Conectar BD y obtener eventos
 $database = new Database();
@@ -157,10 +154,7 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                         <input type="hidden" name="ubicacion" value="<?php echo htmlspecialchars($ubicacion); ?>">
                         <input type="hidden" name="fecha_desde" value="<?php echo htmlspecialchars($fecha_desde); ?>">
                         <input type="hidden" name="fecha_hasta" value="<?php echo htmlspecialchars($fecha_hasta); ?>">
-<<<<<<< HEAD
-=======
                         <input type="hidden" name="orden" value="<?php echo htmlspecialchars($orden); ?>">
->>>>>>> feature/test-navigation.html
                         
                         <!-- Categorías (Radio buttons) -->
                         <div class="filter-group">
@@ -232,11 +226,6 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                                     <div class="event-image">
                                         <img src="<?php echo getImageUrl($evento['imagenPrincipal']); ?>" 
                                              alt="<?php echo htmlspecialchars($evento['nombre']); ?>"
-<<<<<<< HEAD
-                                             onerror="this.src='https://via.placeholder.com/400x250?text=<?php echo urlencode($evento['nombre']); ?>'">
-                                        <span class="event-category"><?php echo htmlspecialchars($evento['tipo']); ?></span>
-                                        <button class="favorite-btn">
-=======
                                              onerror="this.src='<?php echo BASE_URL; ?>/api/admin/events/uploads/0b10db93db401e3d.jpg'">
                                         
                                         <!-- Badge de estado (Trending/Agotado) -->
@@ -250,7 +239,6 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                                         
                                         <!-- Botón favorito -->
                                         <button class="favorite-btn" aria-label="Agregar a favoritos">
->>>>>>> feature/test-navigation.html
                                             <i class="far fa-heart"></i>
                                         </button>
                                     </div>

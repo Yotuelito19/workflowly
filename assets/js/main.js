@@ -253,8 +253,6 @@ async function cargarOrganizadores() {
     sel.appendChild(opt);
   });
 }
-<<<<<<< HEAD
-=======
 
 // ============================================
 // FUNCIONES PARA SEARCH-EVENTS.PHP
@@ -286,4 +284,3 @@ function resetPriceFilter() {
     url.searchParams.delete('precio_max');
     window.location.href = url.toString();
 }
->>>>>>> feature/test-navigation.html
