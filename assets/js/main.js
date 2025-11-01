@@ -253,3 +253,37 @@ async function cargarOrganizadores() {
     sel.appendChild(opt);
   });
 }
+<<<<<<< HEAD
+=======
+
+// ============================================
+// FUNCIONES PARA SEARCH-EVENTS.PHP
+// ============================================
+
+/**
+ * Cambiar el orden de los eventos
+ * Preserva todos los parámetros de búsqueda actuales
+ */
+function changeSort(sortValue) {
+    const url = new URL(window.location.href);
+    url.searchParams.set('orden', sortValue);
+    window.location.href = url.toString();
+}
+
+/**
+ * Resetear el filtro de precio
+ * Elimina los parámetros precio_min y precio_max de la URL
+ */
+function resetPriceFilter() {
+    const precioMinInput = document.getElementById('precio_min');
+    const precioMaxInput = document.getElementById('precio_max');
+    
+    if (precioMinInput) precioMinInput.value = '';
+    if (precioMaxInput) precioMaxInput.value = '';
+    
+    const url = new URL(window.location.href);
+    url.searchParams.delete('precio_min');
+    url.searchParams.delete('precio_max');
+    window.location.href = url.toString();
+}
+>>>>>>> feature/test-navigation.html

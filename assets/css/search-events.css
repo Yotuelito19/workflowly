@@ -553,23 +553,41 @@ body {
     overflow: hidden;
 }
 
+<<<<<<< HEAD
+=======
+.event-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center;
+    display: block;
+}
+
+>>>>>>> feature/test-navigation.html
 .event-badge {
     position: absolute;
     top: var(--spacing-sm);
     left: var(--spacing-sm);
-    padding: 4px 12px;
+    padding: 6px 14px;
     border-radius: 20px;
     font-size: 12px;
     font-weight: 600;
     color: var(--white);
+    text-transform: capitalize;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
 }
 
-.event-badge:not(.sold-out) {
-    background: var(--warning-color);
+.event-badge.trending {
+    background: #FF9800;
 }
 
 .event-badge.sold-out {
-    background: var(--accent-color);
+    background: #FF6B6B;
+}
+
+.event-badge.few-tickets {
+    background: #FFC107;
+    color: #333;
 }
 
 .favorite-btn {

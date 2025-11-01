@@ -6,6 +6,32 @@
 require_once '../config/config.php';
 require_once '../config/database.php';
 
+// Función helper para obtener la URL correcta de la imagen
+function getImageUrl($imagePath) {
+    // Si la imagen es default.jpg o no existe, usar placeholder
+    if (empty($imagePath) || $imagePath === 'default.jpg' || $imagePath === 'imagen/default.jpg') {
+        return BASE_URL . '/api/admin/events/uploads/0b10db93db401e3d.jpg';
+    }
+    
+    // Limpiar la ruta: quitar 'uploads/' si existe para evitar duplicación
+    $cleanPath = str_replace('uploads/', '', $imagePath);
+    
+    // Verificar si la imagen existe en /uploads/ (carpeta principal)
+    $mainUploadPath = UPLOADS_PATH . '/' . $cleanPath;
+    if (file_exists($mainUploadPath)) {
+        return UPLOADS_URL . '/' . $cleanPath;
+    }
+    
+    // Verificar si existe en /api/admin/events/uploads/
+    $adminUploadPath = BASE_PATH . '/api/admin/events/uploads/' . $cleanPath;
+    if (file_exists($adminUploadPath)) {
+        return BASE_URL . '/api/admin/events/uploads/' . $cleanPath;
+    }
+    
+    // Si no existe en ningún lado, retornar placeholder
+    return BASE_URL . '/api/admin/events/uploads/0b10db93db401e3d.jpg';
+}
+
 // Obtener parámetros de búsqueda
 $search = isset($_GET['search']) ? sanitize_input($_GET['search']) : '';
 $tipo = isset($_GET['tipo']) ? sanitize_input($_GET['tipo']) : '';
@@ -14,6 +40,10 @@ $fecha_desde = isset($_GET['fecha_desde']) ? sanitize_input($_GET['fecha_desde']
 $fecha_hasta = isset($_GET['fecha_hasta']) ? sanitize_input($_GET['fecha_hasta']) : '';
 $precio_min = isset($_GET['precio_min']) ? (int)$_GET['precio_min'] : 0;
 $precio_max = isset($_GET['precio_max']) ? (int)$_GET['precio_max'] : 0;
+<<<<<<< HEAD
+=======
+$orden = isset($_GET['orden']) ? sanitize_input($_GET['orden']) : 'fecha_asc';
+>>>>>>> feature/test-navigation.html
 
 // Conectar BD y obtener eventos
 $database = new Database();
@@ -24,6 +54,37 @@ if (!empty($search) || !empty($tipo) || !empty($fecha_desde) || !empty($fecha_ha
     $eventos = $eventoModel->buscarEventos($search, $tipo, $fecha_desde, $fecha_hasta, $ubicacion, $precio_min, $precio_max);
 } else {
     $eventos = $eventoModel->obtenerEventosDisponibles(50, 0);
+}
+
+// Aplicar ordenación en PHP
+if (!empty($eventos)) {
+    switch ($orden) {
+        case 'precio_asc':
+            usort($eventos, function($a, $b) {
+                return ($a['precio_desde'] ?? 0) <=> ($b['precio_desde'] ?? 0);
+            });
+            break;
+        case 'precio_desc':
+            usort($eventos, function($a, $b) {
+                return ($b['precio_desde'] ?? 0) <=> ($a['precio_desde'] ?? 0);
+            });
+            break;
+        case 'fecha_asc':
+            usort($eventos, function($a, $b) {
+                return strtotime($a['fechaInicio']) <=> strtotime($b['fechaInicio']);
+            });
+            break;
+        case 'popularidad':
+            usort($eventos, function($a, $b) {
+                $ventasA = $a['aforoTotal'] - $a['entradasDisponibles'];
+                $ventasB = $b['aforoTotal'] - $b['entradasDisponibles'];
+                return $ventasB <=> $ventasA;
+            });
+            break;
+        default:
+            // Por defecto: fecha ascendente
+            break;
+    }
 }
 
 // Obtener tipos de eventos únicos para el filtro
@@ -96,6 +157,10 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                         <input type="hidden" name="ubicacion" value="<?php echo htmlspecialchars($ubicacion); ?>">
                         <input type="hidden" name="fecha_desde" value="<?php echo htmlspecialchars($fecha_desde); ?>">
                         <input type="hidden" name="fecha_hasta" value="<?php echo htmlspecialchars($fecha_hasta); ?>">
+<<<<<<< HEAD
+=======
+                        <input type="hidden" name="orden" value="<?php echo htmlspecialchars($orden); ?>">
+>>>>>>> feature/test-navigation.html
                         
                         <!-- Categorías (Radio buttons) -->
                         <div class="filter-group">
@@ -139,31 +204,60 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                 <div class="results-content">
                     <div class="results-header">
                         <h2><?php echo count($eventos); ?> eventos encontrados</h2>
-                        <div class="results-sort">
-                            <label>Ordenar por:</label>
-                            <select>
-                                <option>Fecha (más cercano)</option>
-                                <option>Precio (menor a mayor)</option>
-                                <option>Precio (mayor a menor)</option>
-                                <option>Popularidad</option>
-                            </select>
+                        <div class="results-controls">
+                            <div class="sort-dropdown">
+                                <select id="sort-select" onchange="changeSort(this.value)">
+                                    <option value="fecha_asc" <?php echo $orden === 'fecha_asc' ? 'selected' : ''; ?>>Fecha: más próximo</option>
+                                    <option value="precio_asc" <?php echo $orden === 'precio_asc' ? 'selected' : ''; ?>>Precio: menor a mayor</option>
+                                    <option value="precio_desc" <?php echo $orden === 'precio_desc' ? 'selected' : ''; ?>>Precio: mayor a menor</option>
+                                    <option value="popularidad" <?php echo $orden === 'popularidad' ? 'selected' : ''; ?>>Más populares</option>
+                                </select>
+                            </div>
                         </div>
                     </div>
 
                     <div class="events-grid">
                         <?php if (!empty($eventos)): ?>
-                            <?php foreach ($eventos as $evento): ?>
+                            <?php foreach ($eventos as $evento): 
+                                // Calcular si está agotado o casi agotado
+                                $entradasDisp = (int)$evento['entradasDisponibles'];
+                                $aforoTotal = (int)$evento['aforoTotal'];
+                                $porcentajeVendido = $aforoTotal > 0 ? (($aforoTotal - $entradasDisp) / $aforoTotal) * 100 : 0;
+                                
+                                $isAgotado = $entradasDisp <= 0;
+                                $isPocasEntradas = $entradasDisp > 0 && $entradasDisp <= ($aforoTotal * 0.1); // Menos del 10%
+                                $isTrending = $porcentajeVendido >= 70; // Más del 70% vendido
+                            ?>
                                 <div class="event-card">
                                     <div class="event-image">
-                                        <img src="<?php echo UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>" 
+                                        <img src="<?php echo getImageUrl($evento['imagenPrincipal']); ?>" 
                                              alt="<?php echo htmlspecialchars($evento['nombre']); ?>"
+<<<<<<< HEAD
                                              onerror="this.src='https://via.placeholder.com/400x250?text=<?php echo urlencode($evento['nombre']); ?>'">
                                         <span class="event-category"><?php echo htmlspecialchars($evento['tipo']); ?></span>
                                         <button class="favorite-btn">
+=======
+                                             onerror="this.src='<?php echo BASE_URL; ?>/api/admin/events/uploads/0b10db93db401e3d.jpg'">
+                                        
+                                        <!-- Badge de estado (Trending/Agotado) -->
+                                        <?php if ($isAgotado): ?>
+                                            <span class="event-badge sold-out">Agotado</span>
+                                        <?php elseif ($isTrending): ?>
+                                            <span class="event-badge trending">Trending</span>
+                                        <?php elseif ($isPocasEntradas): ?>
+                                            <span class="event-badge few-tickets">Últimas entradas</span>
+                                        <?php endif; ?>
+                                        
+                                        <!-- Botón favorito -->
+                                        <button class="favorite-btn" aria-label="Agregar a favoritos">
+>>>>>>> feature/test-navigation.html
                                             <i class="far fa-heart"></i>
                                         </button>
                                     </div>
                                     <div class="event-content">
+                                        <!-- Categoría del evento -->
+                                        <span class="event-category"><?php echo htmlspecialchars($evento['tipo']); ?></span>
+                                        
                                         <h3><?php echo htmlspecialchars($evento['nombre']); ?></h3>
                                         <div class="event-details">
                                             <div class="detail-item">
