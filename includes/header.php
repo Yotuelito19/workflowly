@@ -17,8 +17,8 @@
         <nav class="nav-menu">
             <a href="<?php echo BASE_URL; ?>/views/search-events.php">Eventos</a>
             <a href="<?php echo BASE_URL; ?>/index.php#como-funciona">Cómo funciona</a>
-            <?php if (is_organizer()): ?>
-                <a href="<?php echo BASE_URL; ?>/views/account.php#mis-eventos">Mis Eventos</a>
+            <?php if (is_admin()): ?>
+                <a href="<?php echo BASE_URL; ?>/views/admin/events.php">Gestor</a>
             <?php endif; ?>
         </nav>
         <div class="nav-actions">
