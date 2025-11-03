@@ -46,7 +46,7 @@
         }
 
         .section-title {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #5B7C99;
             color: white;
             padding: 15px 20px;
             border-radius: 10px;
@@ -104,25 +104,6 @@
             margin-top: 5px;
         }
 
-        .api-method {
-            display: inline-block;
-            padding: 3px 8px;
-            border-radius: 5px;
-            font-size: 0.75em;
-            font-weight: bold;
-            margin-right: 8px;
-        }
-
-        .method-get {
-            background: #28a745;
-            color: white;
-        }
-
-        .method-post {
-            background: #007bff;
-            color: white;
-        }
-
         .badge {
             display: inline-block;
             padding: 4px 10px;
@@ -159,6 +140,18 @@
             color: #2196F3;
         }
 
+        .warning-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin-bottom: 20px;
+            border-radius: 5px;
+        }
+
+        .warning-box strong {
+            color: #856404;
+        }
+
         .legend {
             display: flex;
             gap: 20px;
@@ -187,6 +180,10 @@
 
             .links-grid {
                 grid-template-columns: 1fr;
+            }
+
+            .section > div[style*="grid-template-columns: 1fr 1fr"] {
+                grid-template-columns: 1fr !important;
             }
         }
     </style>
@@ -222,47 +219,40 @@
                     <a href="http://localhost/workflowly/views/search-events.php" target="_blank">views/search-events.php</a>
                     <span class="link-description">Búsqueda y filtrado de eventos</span>
                 </div>
-                <div class="link-card">
-                    <a href="http://localhost/workflowly/views/event-detail.php?id=1" target="_blank">views/event-detail.php?id=1</a>
-                    <span class="link-description">Detalle de un evento específico (ejemplo con ID=1)</span>
-                </div>
             </div>
         </div>
 
-        <!-- PÁGINAS PRIVADAS (REQUIEREN LOGIN) -->
+        <!-- PÁGINAS PRIVADAS Y ADMIN EN DOS COLUMNAS -->
         <div class="section">
-            <div class="section-title">
-                <span class="icon">🔒</span>
-                <span>Páginas Privadas (Usuarios Logueados)</span>
-                <span class="badge badge-private">Requiere login</span>
-            </div>
-            <div class="links-grid">
-                <div class="link-card">
-                    <a href="http://localhost/workflowly/views/account.php" target="_blank">views/account.php</a>
-                    <span class="link-description">Cuenta de usuario, entradas, historial de compras</span>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                <!-- Columna izquierda: Páginas Privadas -->
+                <div>
+                    <div class="section-title">
+                        <span class="icon">🔒</span>
+                        <span>Páginas Privadas</span>
+                        <span class="badge badge-private">Requiere login</span>
+                    </div>
+                    <div class="links-grid" style="grid-template-columns: 1fr;">
+                        <div class="link-card">
+                            <a href="http://localhost/workflowly/views/account.php" target="_blank">views/account.php</a>
+                            <span class="link-description">Cuenta de usuario, entradas, historial de compras</span>
+                        </div>
+                    </div>
                 </div>
-                <div class="link-card">
-                    <a href="http://localhost/workflowly/views/checkout.php" target="_blank">views/checkout.php</a>
-                    <span class="link-description">Proceso de compra de entradas</span>
-                </div>
-                <div class="link-card">
-                    <a href="http://localhost/workflowly/views/confirmation.php" target="_blank">views/confirmation.php</a>
-                    <span class="link-description">Confirmación de compra exitosa</span>
-                </div>
-            </div>
-        </div>
 
-        <!-- PÁGINAS ADMIN -->
-        <div class="section">
-            <div class="section-title">
-                <span class="icon">👨‍💼</span>
-                <span>Panel de Administración</span>
-                <span class="badge badge-admin">Solo Admin</span>
-            </div>
-            <div class="links-grid">
-                <div class="link-card">
-                    <a href="http://localhost/workflowly/views/admin/events.php" target="_blank">views/admin/events.php</a>
-                    <span class="link-description">Gestor de eventos (crear, editar, eliminar, desactivar)</span>
+                <!-- Columna derecha: Panel Admin -->
+                <div>
+                    <div class="section-title">
+                        <span class="icon">👨‍💼</span>
+                        <span>Panel de Administración</span>
+                        <span class="badge badge-admin">Solo Admin</span>
+                    </div>
+                    <div class="links-grid" style="grid-template-columns: 1fr;">
+                        <div class="link-card">
+                            <a href="http://localhost/workflowly/views/admin/events.php" target="_blank">views/admin/events.php</a>
+                            <span class="link-description">Gestor de eventos (crear, editar, eliminar, desactivar)</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
