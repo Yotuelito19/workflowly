@@ -345,31 +345,37 @@ try {
                         <div class="card-header">
                             <h3>Selecciona tus entradas</h3>
                             <?php
-                            // Estado de disponibilidad por TOTAL de entradas (solo al cargar)
+                            // Porcentaje de disponibilidad respecto al AFORO TOTAL del evento
                             $sumDisponibles = 0;
                             foreach (($tiposEntrada ?? []) as $t) {
                                 $sumDisponibles += (int)($t['disponibles'] ?? 0);
                             }
 
-                            if ($sumDisponibles <= 0) {
+                            $aforoTotal = (int)($evento['aforoTotal'] ?? 0);
+                            $percentLeft = ($aforoTotal > 0)
+                                ? (int)round(($sumDisponibles / $aforoTotal) * 100)
+                                : 0;
+
+                            // Umbrales por porcentaje 
+                            if ($percentLeft <= 0) {
                                 $stockClass = 'soldout';
                                 $stockText  = 'Entradas agotadas';
-                            } elseif ($sumDisponibles <= 10) {
+                            } elseif ($percentLeft <= 10) {
                                 $stockClass = 'low';
-                                $stockText  = 'Pocas entradas disponibles';
-                            } elseif ($sumDisponibles <= 50) {
+                                $stockText  = '¡Últimas entradas! (' . $percentLeft . '%)';
+                            } elseif ($percentLeft <= 35) {
                                 $stockClass = 'medium';
-                                $stockText  = 'Entradas limitadas';
+                                $stockText  = 'Entradas limitadas (' . $percentLeft . '%)';
                             } else {
                                 $stockClass = 'available';
-                                $stockText  = 'Entradas disponibles';
+                                $stockText  = 'Entradas disponibles (' . $percentLeft . '%)';
                             }
                             ?>
                             <div class="availability-status">
                                 <span class="status-indicator <?php echo $stockClass; ?>"></span>
                                 <span><?php echo $stockText; ?></span>
                             </div>
-                        </div>
+
 
                         <?php if (!empty($tiposEntrada)): ?>
                             <form action="checkout.php" method="POST" id="ticketForm">

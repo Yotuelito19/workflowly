@@ -15,7 +15,7 @@ $eventoModel = new Evento($db);
 $eventos = $eventoModel->listarTodos(100, 0);
 
 // Estados para select
-$stmt = $db->query("SELECT idEstado, nombre FROM Estado ORDER BY nombre ASC");
+$stmt = $db->query("SELECT idEstado, nombre FROM Estado WHERE tipoEntidad = 'General' ORDER BY nombre ASC");
 $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 <!DOCTYPE html>
@@ -90,6 +90,7 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <option value="">-- Tipos existentes --</option>
         </select>
         <button type="button" id="ticketNew" class="secondary">Nuevo</button>
+        <button type="button" id="ticketDelete" class="danger" disabled>Eliminar</button>
       </div>
       <small class="muted">“Entradas disponibles” del evento se calcula como la suma de cantidades.</small>
     </fieldset>
@@ -489,6 +490,38 @@ document.getElementById('btnGuardarLugar')?.addEventListener('click', async () =
   document.getElementById('entradasDisponibles').value = data.capacidad || 0;
   document.getElementById('modalLugar').classList.add('hidden');
 });
+// habilitar / deshabilitar "Eliminar" según haya selección
+document.getElementById('ticketSelect')?.addEventListener('change', (e) => {
+  const has = !!e.target.value;
+  document.getElementById('ticketDelete').disabled = !has;
+});
+
+// Eliminar tipo seleccionado
+document.getElementById('ticketDelete')?.addEventListener('click', async () => {
+  const idEvento = parseInt(document.getElementById('idEvento').value || '0', 10);
+  const idTipo   = parseInt(document.getElementById('ticketSelect').value || '0', 10);
+  if (!idEvento || !idTipo) return;
+
+  if (!confirm('¿Eliminar este tipo de entrada?')) return;
+
+  const fd = new FormData();
+  fd.append('idEvento', idEvento);
+  fd.append('idTipoEntrada', idTipo);
+
+  const res  = await fetch('../../api/admin/tipos/eliminar.php', { method:'POST', body: fd });
+  const json = await res.json();
+
+  if (!json.ok) {
+    alert(json.msg || 'No se pudo eliminar');
+    return;
+  }
+
+  // recargar lista de tipos
+  await cargarTipos(idEvento);
+  // volver a deshabilitar el botón
+  document.getElementById('ticketDelete').disabled = true;
+});
+
 </script>
 
 </body>
