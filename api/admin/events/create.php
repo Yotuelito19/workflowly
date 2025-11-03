@@ -40,10 +40,17 @@ try {
   $estadoId = (int)($_POST['idEstadoEvento'] ?? 0);
 
   // 👇 NUEVO: pueden venir vacíos
-  $idLugar        = !empty($_POST['idLugar']) ? (int)$_POST['idLugar'] : null;
+  $idLugar = !empty($_POST['idLugar']) ? (int)$_POST['idLugar'] : null;
+  if ($idLugar) {
+  $stL = $db->prepare("SELECT nombre, ciudad FROM Lugar WHERE idLugar=:id");
+  $stL->execute([':id'=>$idLugar]);
+  if ($r = $stL->fetch(PDO::FETCH_ASSOC)) {
+    $ubic = trim($r['nombre'] . (!empty($r['ciudad']) ? ' (' . $r['ciudad'] . ')' : ''));
+  }
+}
   $idOrganizador  = !empty($_POST['idOrganizador']) ? (int)$_POST['idOrganizador'] : null;
 
-  if (!$nombre || !$tipo || !$inicio || !$fin || !$ubic || $aforo <= 0 || $stock < 0) {
+  if (!$nombre || !$tipo || !$inicio || !$fin || $aforo <= 0 || $stock < 0) {
     json_error('Faltan datos obligatorios.');
   }
   if (strtotime($fin) <= strtotime($inicio)) {
@@ -101,3 +108,34 @@ try {
 } catch (Throwable $e) {
   json_error($e->getMessage(), 400);
 }
+// Guardar tipos de entrada (si vienen)
+if (!empty($_POST['tickets'])) {
+  $tickets = json_decode($_POST['tickets'], true) ?: [];
+  if ($tickets) {
+    $ins = $db->prepare(
+      "INSERT INTO TipoEntrada
+         (idEvento, nombre, descripcion, precio, cantidadDisponible, fechaInicioVenta, fechaFinVenta)
+       VALUES
+         (:e, :n, '', :p, :c, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))"
+    );
+    foreach ($tickets as $t) {
+      if (empty($t['nombre'])) continue;
+      $ins->execute([
+        ':e' => $idInserted,
+        ':n' => $t['nombre'],
+        ':p' => (float)($t['precio'] ?? 0),
+        ':c' => (int)($t['cantidad'] ?? 0),
+      ]);
+    }
+    // recalcular stock
+    $db->prepare(
+      "UPDATE Evento e
+          JOIN (SELECT idEvento, COALESCE(SUM(cantidadDisponible),0) s FROM TipoEntrada WHERE idEvento=:e) x
+            ON x.idEvento = e.idEvento
+         SET e.entradasDisponibles = x.s
+       WHERE e.idEvento=:e"
+    )->execute([':e'=>$idInserted]);
+  }
+}
+
+json_success(['ok' => true, 'idEvento' => $idInserted]);

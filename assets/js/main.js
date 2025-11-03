@@ -232,11 +232,15 @@ async function cargarLugares() {
   const res = await fetch('../../api/admin/lugares/listar.php');
   const lugares = await res.json();
   const sel = document.getElementById('idLugar');
+  if (!sel) return;
   sel.innerHTML = '<option value="">-- Selecciona lugar --</option>';
   lugares.forEach(l => {
     const opt = document.createElement('option');
     opt.value = l.idLugar;
-    opt.textContent = l.nombre;
+    opt.textContent = l.ciudad ? `${l.nombre} (${l.ciudad})` : l.nombre;
+    if (typeof l.capacidad !== 'undefined' && l.capacidad !== null) {
+      opt.dataset.capacidad = l.capacidad;
+    }
     sel.appendChild(opt);
   });
 }
@@ -245,11 +249,12 @@ async function cargarOrganizadores() {
   const res = await fetch('../../api/admin/organizadores/listar.php');
   const orgs = await res.json();
   const sel = document.getElementById('idOrganizador');
+  if (!sel) return;
   sel.innerHTML = '<option value="">-- Selecciona organizador --</option>';
   orgs.forEach(o => {
     const opt = document.createElement('option');
     opt.value = o.idOrganizador;
-    opt.textContent = o.nombre;
+    opt.textContent = o.apellidos ? `${o.nombre} ${o.apellidos}` : o.nombre;
     sel.appendChild(opt);
   });
 }
@@ -284,3 +289,4 @@ function resetPriceFilter() {
     url.searchParams.delete('precio_max');
     window.location.href = url.toString();
 }
+

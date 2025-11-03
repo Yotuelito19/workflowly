@@ -5,14 +5,12 @@ require_once __DIR__ . '/../../../config/database.php';
 $database = new Database();
 $db = $database->getConnection();
 
-/*
-   Solo los que están en tabla Organizador
-   (si no tienes la tabla, este archivo fallará; en ese caso lo adaptamos a Usuario)
-*/
-$sql = "SELECT o.idOrganizador, u.nombre
+
+$sql = "SELECT o.idOrganizador, u.nombre, u.apellidos
         FROM Organizador o
         JOIN Usuario u ON o.idUsuario = u.idUsuario
-        ORDER BY u.nombre";
+        ORDER BY u.nombre, u.apellidos";
+
 
 $stmt = $db->query($sql);
 $data = $stmt->fetchAll(PDO::FETCH_ASSOC);

@@ -108,3 +108,27 @@ try {
   echo json_encode(['ok'=>false,'error'=>$e->getMessage()], JSON_UNESCAPED_UNICODE);
   exit;
 }
+// Eliminar tipos de entrada anteriores
+$del = $db->prepare("DELETE FROM TipoEntrada WHERE idEvento = :idEvento");
+$del->execute([':idEvento' => $idEvento]);
+
+// Insertar los nuevos (si vienen)
+if (!empty($_POST['tickets'])) {
+  $tickets = json_decode($_POST['tickets'], true) ?: [];
+  if ($tickets) {
+    $ins = $db->prepare(
+      "INSERT INTO TipoEntrada
+       (idEvento, nombre, descripcion, precio, cantidadDisponible, fechaInicioVenta, fechaFinVenta)
+       VALUES (:idEvento, :nombre, '', :precio, :cantidad, NOW(), DATE_ADD(NOW(), INTERVAL 1 YEAR))"
+    );
+    foreach ($tickets as $t) {
+      if (empty($t['nombre'])) continue;
+      $ins->execute([
+        ':idEvento' => $idEvento,
+        ':nombre'   => $t['nombre'],
+        ':precio'   => (float)($t['precio'] ?? 0),
+        ':cantidad' => (int)($t['cantidad'] ?? 0),
+      ]);
+    }
+  }
+}
