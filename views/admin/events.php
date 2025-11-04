@@ -65,7 +65,7 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <input type="datetime-local" name="fechaFin" id="fechaFin" required step="1">
         </div>
       </div>
-      <div class="grid-2">
+<div class="grid-2">
 
   <div>
     <label>Estado</label>
@@ -75,6 +75,12 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
       <?php endforeach; ?>
     </select>
   </div>
+<div>
+      <label>Organizador</label>
+      <select name="idOrganizador" id="idOrganizador">
+        <option value="">-- Selecciona organizador --</option>
+      </select>
+    </div>
 </div>
 
 <!-- 🔽 NUEVO BLOQUE -->
@@ -88,12 +94,7 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
   </div>
 
   <div class="event-form-right">
-    <div>
-      <label>Organizador</label>
-      <select name="idOrganizador" id="idOrganizador">
-        <option value="">-- Selecciona organizador --</option>
-      </select>
-    </div>
+    
 
     <fieldset class="ticket-box">
       <legend>Tipos de entrada y precios</legend>
@@ -182,8 +183,6 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
   <label>Capacidad (aforo)</label>
   <input type="number" id="lugarCapacidad" min="1" required>
-
-  <!-- NUEVOS CAMPOS -->
   <div class="inline-group">
     <input type="checkbox" id="lugarAcceso">
     <label for="lugarAcceso">Acceso para personas con movilidad reducida</label>

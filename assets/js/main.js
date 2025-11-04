@@ -290,3 +290,99 @@ function resetPriceFilter() {
     window.location.href = url.toString();
 }
 
+(function initSortableTable(){
+  const table = document.querySelector('table');
+  if (!table) return;
+
+  const thead = table.querySelector('thead');
+  const tbody = table.querySelector('#tbody');
+  if (!thead || !tbody) return;
+
+  // Mapa de columnas -> clave dentro del JSON de cada fila
+  // Índices basados en tu <thead>:
+  // 0: ID, 1: Nombre, 2: Inicio, 3: Fin, 4: Estado, 5: Stock, 6: Acciones (no ordena)
+  const columnKeyMap = {
+    0: 'idEvento',
+    1: 'nombre',
+    2: 'fechaInicio',
+    3: 'fechaFin',
+    4: 'estado_nombre',
+    5: 'entradasDisponibles'
+  };
+
+  // Marca como "sortable" todos los TH salvo el último (Acciones)
+  const ths = Array.from(thead.querySelectorAll('th'));
+  ths.forEach((th, idx) => {
+    if (idx === ths.length - 1) return; // Acciones: no ordenable
+    th.classList.add('sortable');
+    const indicator = document.createElement('span');
+    indicator.className = 'sort-indicator';
+    th.appendChild(indicator);
+
+    th.addEventListener('click', () => {
+      const key = columnKeyMap[idx];
+      if (!key) return;
+
+      // Alternar dirección
+      const isAsc = !th.classList.contains('is-asc');
+      ths.forEach(h => h.classList.remove('is-asc', 'is-desc'));
+      th.classList.add(isAsc ? 'is-asc' : 'is-desc');
+
+      // Tomar filas actuales
+      const rows = Array.from(tbody.querySelectorAll('tr'));
+
+      // Función para extraer valor desde data-json (si falla, usa el texto de la celda)
+      const getValue = (tr) => {
+        try {
+          const obj = JSON.parse(tr.getAttribute('data-json') || '{}');
+          return obj[key];
+        } catch {
+          const cell = tr.children[idx];
+          return cell ? cell.textContent.trim() : '';
+        }
+      };
+
+      // Comparadores por tipo de campo
+      const parseMaybeDate = (v) => {
+        // Soporta 'YYYY-MM-DD HH:MM:SS' y variantes parseables por Date
+        const d = new Date(v);
+        return isNaN(d.getTime()) ? null : d.getTime();
+      };
+
+      const isNumericKey = ['idEvento','entradasDisponibles'].includes(key);
+      const isDateKey    = ['fechaInicio','fechaFin'].includes(key);
+
+      rows.sort((a, b) => {
+        let va = getValue(a), vb = getValue(b);
+
+        if (isNumericKey) {
+          va = Number(va); vb = Number(vb);
+          if (isNaN(va)) va = -Infinity;
+          if (isNaN(vb)) vb = -Infinity;
+        } else if (isDateKey) {
+          va = parseMaybeDate(va);
+          vb = parseMaybeDate(vb);
+          if (va === null) va = -Infinity;
+          if (vb === null) vb = -Infinity;
+        } else {
+          // Texto (Nombre, Estado)
+          va = (va ?? '').toString().toLowerCase();
+          vb = (vb ?? '').toString().toLowerCase();
+        }
+
+        let cmp = 0;
+        if (isNumericKey || isDateKey) {
+          cmp = va - vb;
+        } else {
+          cmp = va.localeCompare(vb, 'es', { sensitivity: 'base' });
+        }
+        return isAsc ? cmp : -cmp;
+      });
+
+      // Reinyectar filas en el nuevo orden
+      const frag = document.createDocumentFragment();
+      rows.forEach(r => frag.appendChild(r));
+      tbody.appendChild(frag);
+    });
+  });
+})();
