@@ -1,10 +1,8 @@
 /* =========================================
-   WorkFlowly - Panel de eventos (estilo web)
-   Usa las mismas variables que inicio.css
+   WorkFlowly - Panel de eventos (admin)
    ========================================= */
 
 :root {
-  /* por si alguien abre esto sin haber cargado inicio.css */
   --primary-color: #4CAF50;
   --primary-dark: #388E3C;
   --secondary-color: #2C3E50;
@@ -25,54 +23,69 @@
   --spacing-lg: 32px;
 }
 
-/* fondo igual que las secciones claras del index */
+* {
+  box-sizing: border-box;
+}
+
 body {
   background: var(--gray-100);
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   color: var(--text-dark);
   margin: 0;
+  line-height: 1.6;
 }
 
-/* adaptamos .admin-wrap a .container del index */
+/* Container principal */
+.container {
+  max-width: var(--container-width);
+  margin: 0 auto;
+  padding: 0 var(--spacing-md);
+}
+
+/* Wrapper del admin */
 .admin-wrap {
   max-width: var(--container-width);
   margin: 32px auto 48px;
-  padding: 0 var(--spacing-sm);
+  padding: 0 var(--spacing-md);
 }
 
-/* título igual que sección */
 .admin-wrap > h1 {
   font-size: 2rem;
   font-weight: 700;
-  margin-bottom: 10px;
+  margin-bottom: 8px;
   color: var(--text-dark);
 }
 
 .admin-wrap > h2 {
-  font-size: 1.15rem;
-  margin-bottom: 10px;
+  font-size: 1.25rem;
+  margin-bottom: 16px;
+  margin-top: 32px;
   color: var(--text-dark);
+  font-weight: 600;
 }
 
-/* ==== CARD del formulario (parecido a search-box / event-item) ==== */
+/* ==== FORMULARIO ==== */
 #form-evento {
   background: var(--white);
-  border: 1px solid rgba(44,62,80,.05);
+  border: 1px solid var(--gray-200);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow-small);
-  padding: 18px 18px 20px;
+  padding: 24px;
   margin-bottom: var(--spacing-lg);
+}
+
+#form-evento > div {
+  margin-bottom: 0;
 }
 
 #form-evento label {
   display: block;
   font-weight: 600;
-  margin-bottom: 4px;
-  font-size: .82rem;
+  margin-bottom: 6px;
+  font-size: 0.9rem;
   color: var(--text-dark);
 }
 
-/* inputs estilo web */
 #form-evento input[type="text"],
 #form-evento input[type="number"],
 #form-evento input[type="datetime-local"],
@@ -83,72 +96,121 @@ body {
   background: #fff;
   border: 1px solid var(--gray-300);
   border-radius: var(--border-radius-small);
-  padding: 9px 12px;
-  font-size: .85rem;
-  transition: border .15s ease, box-shadow .15s ease;
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  transition: border 0.2s ease, box-shadow 0.2s ease;
+  font-family: inherit;
 }
 
 #form-evento input:focus,
 #form-evento select:focus,
 #form-evento textarea:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 3px rgba(76,175,80,.12);
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
   outline: none;
 }
 
-/* las grids que ya tienes pero estilo web */
+#form-evento textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* Label especÃ­fico para imagen con mÃ¡s espacio */
+#form-evento label[for="imagenPrincipal"] {
+  margin-top: 16px;
+  margin-bottom: 8px;
+}
+
+/* Espaciado despuÃ©s de la imagen y antes de botones */
+#form-evento input[type="file"] {
+  margin-bottom: 32px;
+}
+
+/* Contenedor de botones del formulario */
+#form-evento button[type="submit"],
+#form-evento button[type="button"]:not(.secondary) {
+  margin-top: 8px;
+  margin-right: 12px;
+}
+
+/* Grid layouts */
 .grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 14px;
-  margin-bottom: 14px;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-@media (max-width: 980px) {
+/* Responsive */
+@media (max-width: 768px) {
   .grid-2 {
     grid-template-columns: 1fr;
   }
 }
 
-/* bloque lugar / organizador / tickets */
+/* Bloque derecho (lugar/organizador/tickets) */
 .event-form-right {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
 }
 
-/* ticket-box como una mini-card */
+/* Ticket box */
 .ticket-box {
-  border: 1px dashed var(--gray-300);
+  border: 2px dashed var(--gray-300);
   background: #fff;
   border-radius: 10px;
-  padding: 10px 10px 8px;
+  padding: 12px;
+  margin: 0;
 }
 
 .ticket-box legend {
-  font-size: .78rem;
+  font-size: 0.85rem;
   font-weight: 600;
+  padding: 0 8px;
+  color: var(--text-dark);
 }
 
 .ticket-tools {
   display: flex;
   gap: 8px;
   align-items: center;
+  margin-bottom: 8px;
 }
 
 .ticket-tools select {
-  flex: 1 1 auto;
+  flex: 1;
 }
 
-/* fila aforo */
-#form-evento .fila {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  margin-bottom: 12px;
+.ticket-tools button {
+  white-space: nowrap;
 }
 
-/* botones: usamos los de inicio.css */
+.muted {
+  color: var(--text-light);
+  font-size: 0.8rem;
+  display: block;
+  margin-top: 8px;
+}
+
+/* BotÃ³n + Nuevo lugar */
+#btnNuevoLugar {
+  margin-top: 8px;
+  background: rgba(76,175,80,0.1);
+  border: 1px solid rgba(76,175,80,0.2);
+  color: var(--text-dark);
+  font-size: 0.85rem;
+  padding: 6px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+#btnNuevoLugar:hover {
+  background: rgba(76,175,80,0.2);
+}
+
+/* ==== BOTONES ==== */
 .primary,
 .btn-primary,
 #form-evento button.primary {
@@ -156,62 +218,51 @@ body {
   color: #fff;
   border: none;
   border-radius: var(--border-radius-small);
-  padding: 10px 18px;
+  padding: 12px 24px;
   font-weight: 600;
   cursor: pointer;
-  transition: all .2s ease;
-  display: inline-block;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
 .primary:hover,
-.btn-primary:hover,
-#form-evento button.primary:hover {
+.btn-primary:hover {
   background: var(--primary-dark);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-small);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-medium);
 }
 
+.secondary,
 #btn-reset,
 .btn-secondary {
   background: transparent;
   border: 2px solid var(--gray-300);
   color: var(--text-dark);
   border-radius: var(--border-radius-small);
-  padding: 8px 14px;
+  padding: 10px 20px;
   font-weight: 600;
   cursor: pointer;
-  transition: all .2s ease;
+  transition: all 0.2s ease;
+  font-size: 0.9rem;
 }
 
+.secondary:hover,
 #btn-reset:hover,
 .btn-secondary:hover {
   border-color: var(--primary-color);
   color: var(--primary-color);
 }
 
-/* botón “+ Nuevo lugar” que no desentone */
-#btnNuevoLugar {
-  margin-top: 6px;
-  background: rgba(76,175,80,.11);
-  border: 1px solid rgba(76,175,80,.05);
-  color: var(--text-dark);
-  font-size: .75rem;
-  padding: 5px 10px;
-  border-radius: 999px;
-}
-#btnNuevoLugar:hover {
-  background: rgba(76,175,80,.18);
-}
-
-/* ==== TABLA como “featured-events” pero en tabla ==== */
+/* ==== TABLA ==== */
 table {
   width: 100%;
   border-collapse: collapse;
   background: var(--white);
-  border: 1px solid rgba(44,62,80,.04);
+  border: 1px solid var(--gray-200);
   border-radius: var(--border-radius);
   overflow: hidden;
   box-shadow: var(--shadow-small);
+  margin-top: 24px;
 }
 
 thead {
@@ -221,335 +272,207 @@ thead {
 th {
   color: #fff;
   text-align: left;
-  padding: 10px 14px;
-  font-size: .78rem;
-  letter-spacing: .01em;
+  padding: 12px 16px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 }
 
 td {
-  padding: 9px 14px;
+  padding: 12px 16px;
   border-bottom: 1px solid var(--gray-200);
-  font-size: .8rem;
+  font-size: 0.9rem;
   background: #fff;
 }
 
 tbody tr:hover td {
-  background: rgba(76,175,80,.04);
+  background: rgba(76,175,80,0.05);
 }
 
-/* acciones de la tabla con los mismos botones */
+tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Imagen en tabla */
+td img {
+  max-width: 60px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+}
+
+/* Acciones de tabla */
 .actions {
   display: flex;
   gap: 6px;
+  flex-wrap: wrap;
 }
 
-.actions .primary,
+.actions button {
+  padding: 6px 12px;
+  font-size: 0.8rem;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-weight: 500;
+  border: none;
+}
+
 .actions .btn-edit {
-  background: rgba(76,175,80,.12);
+  background: rgba(76,175,80,0.15);
   color: var(--text-dark);
-  border: 1px solid transparent;
-  padding: 5px 10px;
-  font-size: .72rem;
+}
+
+.actions .btn-edit:hover {
+  background: rgba(76,175,80,0.25);
 }
 
 .actions .btn-inactive {
-  background: rgba(255, 193, 7, .15);
+  background: rgba(255, 193, 7, 0.15);
   color: #8a6d1d;
-  border: none;
-  padding: 5px 10px;
-  font-size: .72rem;
-  border-radius: 999px;
-  cursor: pointer;
 }
 
-.actions .danger,
-.actions .btn-del {
+.actions .btn-inactive:hover {
+  background: rgba(255, 193, 7, 0.25);
+}
+
+.actions .btn-del,
+.actions .danger {
   background: var(--accent-color);
   color: #fff;
-  border: none;
-  padding: 5px 10px;
-  font-size: .72rem;
-  border-radius: 999px;
-  cursor: pointer;
 }
 
-/* ===== MODALES ===== */
+.actions .btn-del:hover,
+.actions .danger:hover {
+  background: #e55a5a;
+}
+
+/* ==== MODALES ==== */
 .modal {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,.35);
+  background: rgba(0,0,0,0.5);
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 200;
+  z-index: 1000;
+  padding: 20px;
 }
+
 .modal.hidden {
   display: none;
 }
+
 .modal-content {
   background: var(--white);
   border-radius: var(--border-radius);
-  padding: 16px 16px 14px;
-  width: min(520px, 92%);
-  box-shadow: var(--shadow-medium);
+  padding: 24px;
+  width: min(600px, 100%);
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  max-height: 90vh;
+  overflow-y: auto;
 }
+
 .modal-content h2 {
   margin-top: 0;
-  margin-bottom: 10px;
-  font-size: 1rem;
+  margin-bottom: 20px;
+  font-size: 1.25rem;
   color: var(--text-dark);
 }
+
 .modal-content label {
+  display: block;
   font-weight: 600;
-  font-size: .78rem;
-  margin-bottom: 4px;
+  font-size: 0.9rem;
+  margin-bottom: 6px;
+  margin-top: 12px;
 }
+
+.modal-content input,
+.modal-content textarea,
+.modal-content select {
+  width: 100%;
+  padding: 10px 12px;
+  border: 1px solid var(--gray-300);
+  border-radius: var(--border-radius-small);
+  font-size: 0.9rem;
+  font-family: inherit;
+}
+
+.modal-content input:focus,
+.modal-content textarea:focus,
+.modal-content select:focus {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(76,175,80,0.1);
+  outline: none;
+}
+
 .modal-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 8px;
-  margin-top: 10px;
+  gap: 12px;
+  margin-top: 24px;
 }
 
-/* ===== Responsive ===== */
-@media (max-width: 720px) {
+.inline-group {
+  display: flex;
+  gap: 8px;
+
+}
+
+.inline-group label {
+  margin: 0;
+  font-weight: 500;
+
+}
+
+/* ==== RESPONSIVE ==== */
+@media (max-width: 768px) {
   .admin-wrap {
-    padding: 0 10px;
+    padding: 0 16px;
+    margin: 16px auto 32px;
   }
+
+  .admin-wrap > h1 {
+    font-size: 1.5rem;
+  }
+
+  .admin-wrap > h2 {
+    font-size: 1.1rem;
+  }
+
+  #form-evento {
+    padding: 16px;
+  }
+
   table {
-    font-size: .75rem;
+    font-size: 0.8rem;
   }
+
+  th, td {
+    padding: 8px;
+  }
+
   .actions {
     flex-direction: column;
   }
-}
-/* 1) Primera fila: que el nombre sea más ancho que el tipo */
-#form-evento .grid-2:first-of-type {
-  grid-template-columns: 1.4fr 0.6fr; /* nombre grande, tipo más estrecho */
-}
 
-/* 2) Fila de fechas: que no ocupen todo el ancho */
-#form-evento .grid-2:nth-of-type(2) {
-  grid-template-columns: 1fr 1fr;
-  column-gap: 14px;
-}
-
-#form-evento .grid-2:nth-of-type(2) input[type="datetime-local"] {
-  max-width: 260px;        /* controla el largo */
-  width: 100%;
-}
-
-/* 3) Que los inputs no se hagan altura “textarea” */
-#form-evento input[type="text"],
-#form-evento input[type="number"],
-#form-evento input[type="datetime-local"],
-#form-evento select {
-  min-height: 36px;
-}
-
-/* 4) Aforo / entradas: que se vean más cerca */
-#form-evento .grid-2:nth-of-type(4) {
-  grid-template-columns: 1fr 1fr;
-  gap: 10px;
-}
-
-/* 5) Responsive: si se rompe en móvil, que vuelvan a 1 columna */
-@media (max-width: 980px) {
-  #form-evento .grid-2:first-of-type,
-  #form-evento .grid-2:nth-of-type(2),
-  #form-evento .grid-2:nth-of-type(4) {
-    grid-template-columns: 1fr;
-  }
-
-  #form-evento .grid-2:nth-of-type(2) input[type="datetime-local"] {
-    max-width: 100%;
-  }
-}
-/* ================================
-   AJUSTES FINOS GESTOR DE EVENTOS
-   ================================ */
-
-/* 1) Primera fila: nombre grande, tipo más fino */
-#form-evento .grid-2:first-of-type {
-  display: grid;
-  grid-template-columns: 1.3fr 0.7fr; /* nombre 65%, tipo 35% */
-  gap: 14px;
-}
-
-/* que el input de nombre se vea igual que los otros */
-#form-evento #nombre {
-  min-height: 38px;
-  font-weight: 500;
-}
-
-/* 2) Fila de fechas: que no parezcan campos largos random */
-#form-evento .grid-2:nth-of-type(2) {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-#form-evento .grid-2:nth-of-type(2) input[type="datetime-local"] {
-  max-width: 240px;
-  min-height: 38px;
-}
-
-/* icono del datepicker mejor alineado en webkit */
-#form-evento input[type="datetime-local"]::-webkit-calendar-picker-indicator {
-  cursor: pointer;
-  opacity: .8;
-}
-
-/* 3) Bloque aforo / entradas: evitar solape */
-#form-evento .grid-2:nth-of-type(4) {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 14px;
-}
-
-#form-evento #aforoTotal,
-#form-evento #entradasDisponibles {
-  min-height: 36px;
-  min-width: 0;           /* que no empujen al otro */
-}
-
-/* 4) Descripción: que parezca textarea del front */
-#form-evento #descripcion {
-  background: #fff;
-  min-height: 110px;
-}
-
-/* 5) Tabla de eventos: ya está bien, no tocamos */
-
-
-/* ===================
-   MODAL: NUEVO LUGAR
-   =================== */
-#modalLugar .modal-content {
-  display: grid;
-  gap: 10px;
-}
-
-#modalLugar .modal-content h2 {
-  margin-bottom: 4px;
-}
-
-#modalLugar .modal-content label {
-  font-weight: 600;
-  font-size: .78rem;
-}
-
-/* 2 columnas para los primeros campos */
-#modalLugar .modal-content input[type="text"],
-#modalLugar .modal-content input[type="number"],
-#modalLugar .modal-content input[type="url"] {
-  width: 100%;
-  min-height: 34px;
-  border: 1px solid #ced4da;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: .78rem;
-}
-
-
-
-#modalLugar .modal-content .inline-group {
-  display: flex;
-  align-items: center;
-  gap: .5rem;
-}
-
-/* ponemos parking / transporte / mapa en columnas */
-#modalLugar .modal-content input#lugarParking,
-#modalLugar .modal-content input#lugarTransporte,
-#modalLugar .modal-content input#lugarMapa {
-  width: 100%;
-}
-
-/* botones del modal igual que los del panel */
-#modalLugar .modal-actions button.btn-primary,
-#modalTipo .modal-actions button.btn-primary {
-  background: var(--primary-color);
-  color: #fff;
-  border: none;
-  border-radius: 8px;
-  padding: 7px 16px;
-  font-weight: 600;
-}
-#modalLugar .modal-actions button.btn-secondary,
-#modalTipo .modal-actions button.btn-secondary {
-  background: #fff;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  padding: 7px 14px;
-  font-weight: 600;
-}
-
-/* =========================
-   MODAL: NUEVO TIPO ENTRADA
-   ========================= */
-#modalTipo .modal-content {
-  display: grid;
-  gap: 8px;
-}
-
-#modalTipo .modal-content label {
-  font-weight: 600;
-  font-size: .78rem;
-}
-
-/* 2 columnas arriba: nombre + descripción */
-#modalTipo .modal-content input#tipoNombre {
-  min-height: 34px;
-}
-
-#modalTipo .modal-content textarea#tipoDescripcion {
-  min-height: 66px;
-  resize: vertical;
-}
-
-/* nombre + descripción en fila */
-#modalTipo .modal-content label[for="tipoNombre"],
-#modalTipo .modal-content label[for="tipoDescripcion"] {
-  display: block;
-}
-
-@media (min-width: 640px) {
-  #modalTipo .modal-content {
-    grid-template-columns: 1fr 1fr;
-    grid-template-areas:
-      "title  title"
-      "nombre descripcion"
-      "precio cantidad"
-      "actions actions";
-  }
-
-  #modalTipo .modal-content h2 {
-    grid-area: title;
-  }
-
-  #modalTipo #tipoNombre {
-    grid-area: nombre;
-  }
-  #modalTipo #tipoDescripcion {
-    grid-area: descripcion;
-  }
-  #modalTipo #tipoPrecio {
-    grid-area: precio;
-  }
-  #modalTipo #tipoCantidad {
-    grid-area: cantidad;
-  }
-  #modalTipo .modal-actions {
-    grid-area: actions;
+  .modal-content {
+    padding: 16px;
   }
 }
 
-/* móvil: una columna */
-@media (max-width: 639px) {
-  #form-evento .grid-2:first-of-type,
-  #form-evento .grid-2:nth-of-type(2),
-  #form-evento .grid-2:nth-of-type(4) {
-    grid-template-columns: 1fr;
+@media (max-width: 480px) {
+  .admin-wrap {
+    padding: 0 12px;
+  }
+
+  #form-evento {
+    padding: 12px;
+  }
+
+  .primary,
+  .btn-primary {
+    width: 100%;
   }
 }

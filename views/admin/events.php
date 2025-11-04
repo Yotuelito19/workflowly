@@ -22,11 +22,14 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Admin — Gestor de Eventos</title>
-  <link rel="stylesheet" href="../../assets/css/admin.css">
-  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin — Gestor de Eventos - WorkFlowly</title>
+  <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/admin.css">
 </head>
 <body>
+  <!-- Header -->
+  <?php include __DIR__ . '/../../includes/header.php'; ?>
+  
   <div class="admin-wrap">
     <h1>Gestor de eventos</h1>
 
@@ -34,10 +37,13 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
     <form id="form-evento" enctype="multipart/form-data">
       <input type="hidden" name="idEvento" id="idEvento">
       <div class="grid-2">
-        <div><label>Nombre</label><input name="nombre" id="nombre" required></div>
         <div>
-  <label>Tipo</label>
-  <select name="tipo" id="tipo" required>
+          <label>Nombre</label>
+          <input name="nombre" id="nombre" required>
+        </div>
+        <div>
+          <label>Tipo</label>
+          <select name="tipo" id="tipo" required>
     <option value="">-- Selecciona --</option>
     <option>Concierto</option>
     <option>Festival</option>
@@ -50,10 +56,16 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
       </div>
       <div class="grid-2">
-        <div><label>Fecha inicio</label><input type="datetime-local" name="fechaInicio" id="fechaInicio" required step="1"></div>
-        <div><label>Fecha fin</label><input type="datetime-local" name="fechaFin" id="fechaFin" required step="1"></div>
+        <div>
+          <label>Fecha inicio</label>
+          <input type="datetime-local" name="fechaInicio" id="fechaInicio" required step="1">
+        </div>
+        <div>
+          <label>Fecha fin</label>
+          <input type="datetime-local" name="fechaFin" id="fechaFin" required step="1">
+        </div>
       </div>
-     <div class="grid-2">
+      <div class="grid-2">
 
   <div>
     <label>Estado</label>
@@ -90,7 +102,7 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
           <option value="">-- Tipos existentes --</option>
         </select>
         <button type="button" id="ticketNew" class="secondary">Nuevo</button>
-        <button type="button" id="ticketDelete" class="danger" disabled>Eliminar</button>
+        <button type="button" id="ticketDelete" class="secondary" disabled>Eliminar</button>
       </div>
       <small class="muted">“Entradas disponibles” del evento se calcula como la suma de cantidades.</small>
     </fieldset>
@@ -99,15 +111,23 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
 
       <div class="grid-2">
-        <div><label>Aforo total</label><input type="number" name="aforoTotal" id="aforoTotal" min="1" required></div>
+        <div>
+          <label>Aforo total</label>
+          <input type="number" name="aforoTotal" id="aforoTotal" min="1" required>
+        </div>
         <div>
           <label>Entradas disponibles</label>
           <input type="number" name="entradasDisponibles" id="entradasDisponibles" min="0" required>
         </div>
       </div>
-      <div class="fila"><label>Descripción</label></div>
-      <div class="fila"><textarea name="descripcion" id="descripcion" rows="4"></textarea></div>
-      <div class="fila"><label>Imagen principal</label><input type="file" name="imagen" id="imagen" accept="image/*"></div>
+      <div class="fila">
+        <label>Descripción</label>
+        <textarea name="descripcion" id="descripcion" rows="4"></textarea>
+      </div>
+      <div class="fila">
+        <label>Imagen principal</label>
+        <input type="file" name="imagen" id="imagen" accept="image/*">
+      </div>
       <button class="primary" type="submit">Guardar</button>
       <button type="button" id="btn-reset">Limpiar</button>
     </form>
