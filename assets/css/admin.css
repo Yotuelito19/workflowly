@@ -416,14 +416,20 @@ td img {
 
 .inline-group {
   display: flex;
+  align-items: center;
   gap: 8px;
+}
 
+.inline-group input[type="checkbox"] {
+  width: auto !important;
+  margin: 0;
+  flex-shrink: 0;
 }
 
 .inline-group label {
   margin: 0;
   font-weight: 500;
-
+  flex: 1;
 }
 
 /* ==== RESPONSIVE ==== */

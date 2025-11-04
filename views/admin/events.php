@@ -184,9 +184,9 @@ $estados = $stmt->fetchAll(PDO::FETCH_ASSOC);
   <input type="number" id="lugarCapacidad" min="1" required>
 
   <!-- NUEVOS CAMPOS -->
-  <div class="inline-group" style="align-items:center; gap:.5rem;">
+  <div class="inline-group">
     <input type="checkbox" id="lugarAcceso">
-    <label for="lugarAcceso" style="margin:0;">Acceso para personas con movilidad reducida</label>
+    <label for="lugarAcceso">Acceso para personas con movilidad reducida</label>
   </div>
 
   <label>Parking</label>
