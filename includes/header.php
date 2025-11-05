@@ -27,7 +27,7 @@
                 <a href="<?php echo BASE_URL; ?>/api/logout.php" class="btn-primary">Cerrar Sesión</a>
             <?php else: ?>
                 <a href="<?php echo BASE_URL; ?>/views/login.php" class="btn-secondary">Iniciar Sesión</a>
-                <a href="<?php echo BASE_URL; ?>/views/login.php" class="btn-primary">Registrarse</a>
+                <a href="<?php echo BASE_URL; ?>/views/login.php?register=1" class="btn-primary" onclick="showRegisterForm(); return true;">Registrarse</a>
             <?php endif; ?>
         </div>
     </div>

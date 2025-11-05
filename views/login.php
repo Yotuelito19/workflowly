@@ -10,6 +10,8 @@ require_once '../config/database.php';
 if (is_logged_in()) {
     redirect('/index.php');
 }
+// Detectar si viene desde el botón de registro
+$showRegister = isset($_GET['register']) && $_GET['register'] == '1';
 
 // Procesar login
 $login_error = '';
@@ -180,7 +182,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Right Side - Auth Forms -->
                 <div class="auth-forms">
                     <!-- Login Form -->
-                    <div class="form-container" id="loginForm" <?php echo $register_success ? 'style="display:none;"' : ''; ?>>
+                     <div class="form-container" id="loginForm" <?php echo ($register_success || $showRegister) ? 'style="display:none;"' : ''; ?>>
                         <div class="form-header">
                             <h2>Bienvenido de vuelta</h2>
                             <p>Inicia sesión para acceder a tu cuenta</p>
@@ -252,7 +254,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <!-- Register Form -->
-                    <div class="form-container <?php echo !$register_success ? 'hidden' : ''; ?>" id="registerForm">
+                     <div class="form-container <?php echo (!$register_success && !$showRegister) ? 'hidden' : ''; ?>" id="registerForm">
                         <div class="form-header">
                             <h2>Crear cuenta nueva</h2>
                             <p>Regístrate y empieza a disfrutar eventos sin reventa</p>
