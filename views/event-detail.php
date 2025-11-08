@@ -345,36 +345,45 @@ try {
                         <div class="card-header">
                             <h3>Selecciona tus entradas</h3>
                             <?php
-                            // Porcentaje de disponibilidad respecto al AFORO TOTAL del evento
                             $sumDisponibles = 0;
                             foreach (($tiposEntrada ?? []) as $t) {
                                 $sumDisponibles += (int)($t['disponibles'] ?? 0);
                             }
 
                             $aforoTotal = (int)($evento['aforoTotal'] ?? 0);
-                            $percentLeft = ($aforoTotal > 0)
-                                ? (int)round(($sumDisponibles / $aforoTotal) * 100)
-                                : 0;
 
-                            // Umbrales por porcentaje 
-                            if ($percentLeft <= 0) {
+                            // % REAL en float (no redondees aún)
+                            $percentLeftFloat = ($aforoTotal > 0) ? ($sumDisponibles / $aforoTotal * 100) : 0.0;
+
+                            // Texto bonito para mostrar el % (evita 0% si hay entradas)
+                            if ($sumDisponibles === 0) {
+                                $percentText = '0%';
+                            } elseif ($percentLeftFloat < 1) {
+                                $percentText = '<1%';
+                            } else {
+                                $percentText = (string)round($percentLeftFloat) . '%';
+                            }
+
+                            // UMBRALES por % (usa el float). Ajusta 10 y 35 a tu gusto.
+                            if ($sumDisponibles === 0) {
                                 $stockClass = 'soldout';
                                 $stockText  = 'Entradas agotadas';
-                            } elseif ($percentLeft <= 10) {
+                            } elseif ($percentLeftFloat <= 10) {
                                 $stockClass = 'low';
-                                $stockText  = '¡Últimas entradas! (' . $percentLeft . '%)';
-                            } elseif ($percentLeft <= 35) {
+                                $stockText  = '¡Últimas entradas! (' . $percentText . ')';
+                            } elseif ($percentLeftFloat <= 35) {
                                 $stockClass = 'medium';
-                                $stockText  = 'Entradas limitadas (' . $percentLeft . '%)';
+                                $stockText  = 'Entradas limitadas (' . $percentText . ')';
                             } else {
                                 $stockClass = 'available';
-                                $stockText  = 'Entradas disponibles (' . $percentLeft . '%)';
+                                $stockText  = 'Entradas disponibles (' . $percentText . ')';
                             }
                             ?>
                             <div class="availability-status">
-                                <span class="status-indicator <?php echo $stockClass; ?>"></span>
-                                <span><?php echo $stockText; ?></span>
+                            <span class="status-indicator <?php echo $stockClass; ?>"></span>
+                            <span><?php echo $stockText; ?></span>
                             </div>
+
 
 
                         <?php if (!empty($tiposEntrada)): ?>
