@@ -3,17 +3,17 @@
     --primary-color: #4CAF50;
     --primary-dark: #388E3C;
     --primary-light: #81C784;
-    --secondary-color: #2C3E50;
     --accent-color: #FF6B6B;
     --warning-color: #FF9800;
-    --success-color: #4CAF50;
+    --success-color: #61af4c;
     --error-color: #F44336;
     --info-color: #2196F3;
     --text-dark: #2C3E50;
     --text-light: #7F8C8D;
-    --background-light: #F8F9FA;
+    --background-light: #f8f9fabf;
     --background-dark: #1A1A1A;
     --white: #FFFFFF;
+    --gray-50: #F1F3F5;
     --gray-100: #F8F9FA;
     --gray-200: #E9ECEF;
     --gray-300: #DEE2E6;
@@ -57,6 +57,71 @@ body {
     max-width: var(--container-width);
     margin: 0 auto;
     padding: 0 var(--spacing-md);
+}
+
+/* Header */
+.header {
+    background: var(--white);
+    box-shadow: var(--shadow-small);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    padding: var(--spacing-sm) 0;
+}
+
+.header .container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: var(--text-dark);
+}
+
+.logo-circle {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--white);
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.brand-name {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--text-dark);
+}
+
+.nav-menu {
+    display: flex;
+    gap: var(--spacing-lg);
+}
+
+.nav-menu a {
+    text-decoration: none;
+    color: var(--text-dark);
+    font-weight: 500;
+    font-size: 15px;
+    transition: color 0.3s ease;
+}
+
+.nav-menu a:hover {
+    color: var(--primary-color);
 }
 
 /* User Menu */
@@ -172,21 +237,166 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     white-space: nowrap;
+    text-decoration: none; 
 }
 
 .tab-btn:hover {
     color: var(--text-dark);
+    
 }
 
 .tab-btn.active {
-    color: var(--primary-color);
-    border-bottom-color: var(--primary-color);
+     color: var(--primary-color);
+    background: rgba(76, 175, 80, 0.1);
+    border-radius: 8px;
 }
 
 .tab-btn i {
     font-size: 16px;
 }
+/* ------------------------------------------------------------------ */
+/* 1. ESTILOS PARA LA SECCIÓN DE CONTRASEÑA (el contenedor principal) */
+/* ------------------------------------------------------------------ */
 
+/* Es importante que el contenedor que agrupa los campos de contraseña
+   no tenga su propio fondo blanco ni borde, para que se vean las tarjetas
+   individuales. Añade una clase como esta a ese contenedor. */
+.password-section-container {
+    background: transparent; /* NUEVO: Quita el fondo blanco del contenedor grande */
+    border: none;            /* NUEVO: Quita el borde del contenedor grande */
+    padding: 0;              /* NUEVO: Quita el espaciado si lo tiene */
+}
+
+/* ------------------------------------------------------------- */
+/* 2. TRANSFORMAMOS CADA CAMPO EN UNA "TARJETA" INDIVIDUAL       */
+/* ------------------------------------------------------------- */
+
+.form-group {
+    /* --- Estilos de tarjeta --- */
+    background: #f8f9fa;       /* NUEVO: Fondo gris claro, como en la sección de 2FA */
+    padding: 16px;             /* NUEVO: Espaciado interno para dar apariencia de tarjeta */
+    border-radius: 8px;        /* NUEVO: Bordes redondeados */
+    border: 1px solid #e9ecef; /* NUEVO: Un borde muy sutil para definir la tarjeta */
+    
+    /* --- Estilos que ya tenías --- */
+    margin-bottom: 16px; 
+    margin-left: 10px;
+    margin-right: 10px;/* MODIFICADO: Ajustado para la nueva separación */
+    display: flex;             /* NUEVO: Para alinear mejor los elementos internos */
+    flex-direction: column;    /* NUEVO: Apila la etiqueta sobre el input */
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    color: #212529;            /* NUEVO: Un color de texto un poco más oscuro y estándar */
+}
+
+/* El contenedor del input y el icono del ojo */
+.password-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-wrapper input,
+.form-group input { /* Aplicamos a ambos por si acaso */
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #CED4DA; /* Mantenemos el borde del input por claridad */
+    border-radius: 6px;        /* MODIFICADO: Un radio ligeramente menor que la tarjeta */
+    font-size: 14px;
+    background: #fff;          /* NUEVO: Asegura que el fondo del input sea blanco */
+}
+
+.toggle-password {
+    position: absolute;
+    right: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #6C757D;
+}
+
+/* ------------------------------------------------------------- */
+/* 3. RESTO DE TUS ESTILOS (sin cambios mayores)                 */
+/* ------------------------------------------------------------- */
+
+.password-strength {
+    margin-top: 8px;
+}
+#strength-bar {
+    height: 6px;
+    width: 0%;
+    background: #ccc;
+    border-radius: 3px;
+    transition: all 0.3s ease;
+}
+.strength-text {
+    font-size: 13px;
+    margin-top: 4px;
+    font-weight: 600;
+}
+.alert {
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    opacity: 1;
+    transition: opacity 0.5s ease-out;
+}
+.alert.fade-out {
+    opacity: 0;
+}
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+.alert-danger {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+.d-flex {
+    display: flex;
+}
+.gap-2 {
+    gap: 12px;
+}
+.mt-3 {
+    margin-top: 20px;
+}
+.btn {
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: none;
+    margin-top: 20px;
+    margin-bottom: 20px; 
+    margin-left: 10px;
+}
+.btn-outline-secondary {
+    background: transparent;
+    color: #6C757D;
+    border: 2px solid #CED4DA;
+}
+.btn-outline-secondary:hover {
+    background: #E9ECEF;
+}
+
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 /* Main Content */
 .account-content {
     padding: var(--spacing-xl) 0;
@@ -1305,6 +1515,76 @@ input:checked + .slider:before {
     color: var(--white);
 }
 
+/* Footer */
+.footer {
+    background: var(--background-dark);
+    color: var(--white);
+    padding: var(--spacing-xxl) 0 var(--spacing-md);
+    margin-top: var(--spacing-xxl);
+}
+
+.footer-content {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr 1fr;
+    gap: var(--spacing-xl);
+    margin-bottom: var(--spacing-xl);
+}
+
+.footer-section h4 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: var(--spacing-md);
+}
+
+.footer-section ul {
+    list-style: none;
+}
+
+.footer-section li {
+    margin-bottom: var(--spacing-xs);
+}
+
+.footer-section a {
+    color: var(--gray-400);
+    text-decoration: none;
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer-section a:hover {
+    color: var(--primary-color);
+}
+
+.social-links {
+    display: flex;
+    gap: var(--spacing-sm);
+}
+
+.social-links a {
+    width: 40px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+}
+
+.social-links a:hover {
+    background: var(--primary-color);
+}
+
+.footer-bottom {
+    padding-top: var(--spacing-md);
+    border-top: 1px solid rgba(255,255,255,0.1);
+    text-align: center;
+}
+
+.footer-bottom p {
+    color: var(--gray-400);
+    font-size: 14px;
+}
 
 /* Responsive */
 @media (max-width: 768px) {

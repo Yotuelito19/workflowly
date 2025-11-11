@@ -47,6 +47,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $email = sanitize_input($_POST['email']);
         $telefono = sanitize_input($_POST['telefono']);
         $password = $_POST['password'];
+        $fechaNacimiento = sanitize_input($_POST['fechaNacimiento']);
         $password_confirm = $_POST['password_confirm'];
         $tipoUsuario = isset($_POST['tipoUsuario']) ? sanitize_input($_POST['tipoUsuario']) : 'Comprador';
 
@@ -79,7 +80,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $usuario->apellidos = $apellidos;
                 $usuario->email = $email;
                 $usuario->telefono = $telefono;
-                $usuario->password = $password;  // CORREGIDO: era contraseña
+                $usuario->password = $password;// CORREGIDO: era contraseña
+                $usuario->fechaNacimiento = $fechaNacimiento; 
                 $usuario->tipoUsuario = $tipoUsuario;
                 $usuario->idEstadoUsuario = $idEstadoActivo;
 
@@ -345,7 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 <label for="birthDate">Fecha de nacimiento</label>
                                 <div class="input-wrapper">
                                     <i class="fas fa-calendar"></i>
-                                    <input type="date" id="birthDate" name="birthDate" required>
+                                    <input type="date" id="birthDate" name="fechaNacimiento" required>
                                 </div>
                                 <small>Necesario para verificar edad en eventos</small>
                             </div>
