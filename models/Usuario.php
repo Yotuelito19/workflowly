@@ -15,6 +15,7 @@ class Usuario {
     public $email;
     public $password;
     public $telefono;
+    public $fechaNacimiento;
     public $fechaRegistro;
     public $tipoUsuario;
     public $idEstadoUsuario;
@@ -28,8 +29,8 @@ class Usuario {
      */
     public function registrar() {
         $query = "INSERT INTO " . $this->table_name . " 
-                  (nombre, apellidos, email, password, telefono, tipoUsuario, idEstadoUsuario) 
-                  VALUES (:nombre, :apellidos, :email, :password, :telefono, :tipoUsuario, :idEstado)";
+                  (nombre, apellidos, email, password, telefono, fechaNacimiento, tipoUsuario, idEstadoUsuario) 
+                  VALUES (:nombre, :apellidos, :email, :password, :telefono, :fechaNacimiento, :tipoUsuario, :idEstado)";
 
         $stmt = $this->conn->prepare($query);
 
@@ -38,6 +39,8 @@ class Usuario {
         $this->apellidos = htmlspecialchars(strip_tags($this->apellidos));
         $this->email = htmlspecialchars(strip_tags($this->email));
         $this->telefono = htmlspecialchars(strip_tags($this->telefono));
+        $this->fechaNacimiento = htmlspecialchars(strip_tags($this->fechaNacimiento));
+
 
         // Hash de contraseña
         $password_hash = password_hash($this->password, PASSWORD_HASH_ALGO, ['cost' => PASSWORD_HASH_COST]);
@@ -48,6 +51,7 @@ class Usuario {
         $stmt->bindParam(":email", $this->email);
         $stmt->bindParam(":password", $password_hash);
         $stmt->bindParam(":telefono", $this->telefono);
+        $stmt->bindParam(":fechaNacimiento", $this->fechaNacimiento);
         $stmt->bindParam(":tipoUsuario", $this->tipoUsuario);
         $stmt->bindParam(":idEstado", $this->idEstadoUsuario);
 
@@ -158,19 +162,16 @@ class Usuario {
     /**
      * Cambiar contraseña
      */
-    public function cambiarPassword($nueva_password) {
-        $query = "UPDATE " . $this->table_name . " 
-                  SET password = :password 
-                  WHERE idUsuario = :id";
+    public function actualizarPassword() {
+    $query = "UPDATE " . $this->table_name . "
+              SET password = :password
+              WHERE idUsuario = :idUsuario";
 
-        $stmt = $this->conn->prepare($query);
+    $stmt = $this->conn->prepare($query);
+    $stmt->bindParam(":password", $this->password);
+    $stmt->bindParam(":idUsuario", $this->idUsuario);
 
-        $password_hash = password_hash($nueva_password, PASSWORD_HASH_ALGO, ['cost' => PASSWORD_HASH_COST]);
-
-        $stmt->bindParam(":password", $password_hash);
-        $stmt->bindParam(":id", $this->idUsuario);
-
-        return $stmt->execute();
-    }
+    return $stmt->execute();
+}
 }
 ?>
