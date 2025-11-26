@@ -661,182 +661,209 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     <!-- Footer -->
     <?php include __DIR__ . '/../includes/footer.php'; ?>
 
-    <script>
-    // ============================================
-    // GESTIÓN DE PESTAÑAS
-    // ============================================
-    function showTab(event, tabId) {
-        event.preventDefault();
-        
-        // Ocultar todas las pestañas
-        document.querySelectorAll('.tab-content').forEach(tab => {
-            tab.classList.remove('active');
-        });
-        
-        // Desactivar todos los botones
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-        });
-        
-        // Mostrar pestaña seleccionada
-        const targetTab = document.getElementById(tabId);
-        if (targetTab) {
-            targetTab.classList.add('active');
-        }
-        
-        // Activar botón seleccionado
-        event.currentTarget.classList.add('active');
-        
-        // Actualizar URL sin recargar
-        history.replaceState(null, null, '#' + tabId);
-    }
+        <script>
+    // Todo dentro de una IIFE para no ensuciar el global,
+    // excepto lo que necesitamos (showTab)
+    (function () {
+        // ============================================
+        // GESTIÓN DE PESTAÑAS
+        // ============================================
+        function activarTab(tabId) {
+            // Ocultar todas las pestañas
+            document.querySelectorAll('.tab-content').forEach(function (tab) {
+                tab.classList.remove('active');
+            });
 
-    // ============================================
-    // CAMBIO DE CONTRASEÑA
-    // ============================================
-    const btnMostrarPassword = document.getElementById('btnMostrarPassword');
-    const btnCerrarPassword = document.getElementById('btnCerrarPassword');
-    const formPassword = document.getElementById('formPassword');
+            // Desactivar todos los botones
+            document.querySelectorAll('.tab-btn').forEach(function (btn) {
+                btn.classList.remove('active');
+            });
 
-    if (btnMostrarPassword) {
-        btnMostrarPassword.addEventListener('click', () => {
-            formPassword.style.display = 'block';
-            formPassword.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-        });
-    }
+            // Mostrar pestaña seleccionada
+            var targetTab = document.getElementById(tabId);
+            if (targetTab) {
+                targetTab.classList.add('active');
+            }
 
-    if (btnCerrarPassword) {
-        btnCerrarPassword.addEventListener('click', () => {
-            formPassword.style.display = 'none';
-            // Limpiar campos
-            document.getElementById('password_actual').value = '';
-            document.getElementById('password_nueva').value = '';
-            document.getElementById('password_confirmar').value = '';
-            // Resetear barra de fuerza
-            const strengthBar = document.getElementById('strength-bar');
-            const strengthText = document.getElementById('strength-text');
-            strengthBar.style.width = '0%';
-            strengthBar.style.background = '#ccc';
-            strengthText.textContent = 'Introduce una contraseña';
-            strengthText.style.color = '#6C757D';
-        });
-    }
+            // Activar botón correspondiente
+            var btn = document.querySelector('.tab-btn[href="#' + tabId + '"]');
+            if (btn) {
+                btn.classList.add('active');
+            }
 
-    // Mostrar/Ocultar contraseñas
-    document.querySelectorAll('.toggle-password').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const targetId = btn.getAttribute('data-target');
-            const input = document.getElementById(targetId);
-            if (input.type === 'password') {
-                input.type = 'text';
-                btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+            // Actualizar URL sin recargar
+            if (history && history.replaceState) {
+                history.replaceState(null, '', '#' + tabId);
             } else {
-                input.type = 'password';
-                btn.innerHTML = '<i class="fas fa-eye"></i>';
+                window.location.hash = '#' + tabId;
             }
-        });
-    });
-
-    // ============================================
-    // MEDIDOR DE FUERZA DE CONTRASEÑA
-    // ============================================
-    const passwordInput = document.getElementById('password_nueva');
-    const strengthBar = document.getElementById('strength-bar');
-    const strengthText = document.getElementById('strength-text');
-    let passwordStrengthValue = 0;
-
-    if (passwordInput) {
-        passwordInput.addEventListener('input', () => {
-            const val = passwordInput.value;
-            let strength = 0;
-
-            // Criterios de fuerza
-            if (val.length >= 8) strength += 1;
-            if (val.match(/[a-z]+/)) strength += 1;
-            if (val.match(/[A-Z]+/)) strength += 1;
-            if (val.match(/[0-9]+/)) strength += 1;
-            if (val.match(/[$@#&!%*?]/)) strength += 1;
-
-            passwordStrengthValue = strength;
-
-            // Colores y mensajes
-            const colors = ['#e74c3c', '#e74c3c', '#f39c12', '#f1c40f', '#2ecc71', '#27ae60'];
-            const messages = ['Muy débil', 'Muy débil', 'Débil', 'Moderada', 'Fuerte', 'Muy fuerte'];
-            
-            strengthBar.style.width = (strength * 20) + '%';
-            strengthBar.style.background = colors[strength] || '#ccc';
-            strengthText.textContent = val.length > 0 ? messages[strength] || 'Introduce una contraseña' : 'Introduce una contraseña';
-            strengthText.style.color = colors[strength] || '#6C757D';
-        });
-    }
-
-    // Validar antes de enviar
-    const passwordForm = document.getElementById('passwordForm');
-    if (passwordForm) {
-        passwordForm.addEventListener('submit', (e) => {
-            if (passwordStrengthValue < 3) {
-                e.preventDefault();
-                alert('La contraseña es demasiado débil. Debe tener al menos 8 caracteres e incluir mayúsculas, minúsculas, números y símbolos.');
-                passwordInput.focus();
-            }
-        });
-    }
-
-    // Auto-ocultar mensaje de éxito después de 5 segundos
-    const successMessage = document.getElementById('successMessage');
-    if (successMessage) {
-        setTimeout(() => {
-            successMessage.style.opacity = '0';
-            successMessage.style.transition = 'opacity 0.5s ease';
-            setTimeout(() => {
-                successMessage.remove();
-            }, 500);
-        }, 5000);
-    }
-
-    // ============================================
-    // EDICIÓN DE PERFIL
-    // ============================================
-    function toggleEditMode() {
-        const displays = document.querySelectorAll('.detail-display');
-        const edits = document.querySelectorAll('.detail-edit');
-        const actions = document.querySelector('.edit-actions');
-        
-        displays.forEach(d => {
-            d.style.display = d.style.display === 'none' ? 'block' : 'none';
-        });
-        edits.forEach(e => {
-            e.style.display = e.style.display === 'none' ? 'block' : 'none';
-        });
-        if (actions) {
-            actions.style.display = actions.style.display === 'none' ? 'flex' : 'none';
         }
-    }
-    // Desvanecer mensaje después de 3 segundos
-window.addEventListener('DOMContentLoaded', () => {
-    const alertPerfil = document.getElementById('alertPerfil');
-    const alertPassword = document.getElementById('alertPassword');
-    
-    if (alertPerfil) {
-        setTimeout(() => {
-            alertPerfil.classList.add('fade-out');
-            setTimeout(() => {
-                alertPerfil.style.display = 'none';
-            }, 500); // Esperar a que termine la transición
-        }, 3000); // 3 segundos antes de empezar a desvanecer
-    }
-    
-    if (alertPassword) {
-        setTimeout(() => {
-            alertPassword.classList.add('fade-out');
-            setTimeout(() => {
-                alertPassword.style.display = 'none';
-            }, 500);
-        }, 3000);
-    }
-    
-    // Resto del código de tabs...
-});
+
+        // Esta función la usa el HTML en onclick="showTab(event, 'profile')"
+        window.showTab = function (event, tabId) {
+            if (event && event.preventDefault) {
+                event.preventDefault();
+            }
+            activarTab(tabId);
+        };
+
+        // Activar pestaña según el hash al cargar (por si venimos de #tickets, etc.)
+        document.addEventListener('DOMContentLoaded', function () {
+            var hash = window.location.hash ? window.location.hash.substring(1) : '';
+            if (hash) {
+                activarTab(hash);
+            }
+
+            // ============================================
+            // MOSTRAR / OCULTAR FORMULARIO DE CAMBIO DE CONTRASEÑA
+            // ============================================
+            var btnMostrarPassword = document.getElementById('btnMostrarPassword');
+            var btnCerrarPassword  = document.getElementById('btnCerrarPassword');
+            var formPassword       = document.getElementById('formPassword');
+
+            if (btnMostrarPassword && formPassword) {
+                btnMostrarPassword.addEventListener('click', function () {
+                    formPassword.style.display = 'block';
+                    formPassword.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                });
+            }
+
+            if (btnCerrarPassword && formPassword) {
+                btnCerrarPassword.addEventListener('click', function () {
+                    formPassword.style.display = 'none';
+
+                    // Limpiar campos si existen
+                    var pa = document.getElementById('password_actual');
+                    var pn = document.getElementById('password_nueva');
+                    var pc = document.getElementById('password_confirmar');
+                    if (pa) pa.value = '';
+                    if (pn) pn.value = '';
+                    if (pc) pc.value = '';
+
+                    // Resetear barra de fuerza si existe
+                    var strengthBar  = document.getElementById('strength-bar');
+                    var strengthText = document.getElementById('strength-text');
+                    if (strengthBar) {
+                        strengthBar.style.width = '0%';
+                        strengthBar.style.background = '#ccc';
+                    }
+                    if (strengthText) {
+                        strengthText.textContent = 'Introduce una contraseña';
+                        strengthText.style.color = '#6C757D';
+                    }
+                });
+            }
+
+            // ============================================
+            // MOSTRAR / OCULTAR CONTRASEÑAS
+            // ============================================
+            document.querySelectorAll('.toggle-password').forEach(function (btn) {
+                btn.addEventListener('click', function () {
+                    var targetId = btn.getAttribute('data-target');
+                    var input = document.getElementById(targetId);
+                    if (!input) return;
+
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        btn.innerHTML = '<i class="fas fa-eye-slash"></i>';
+                    } else {
+                        input.type = 'password';
+                        btn.innerHTML = '<i class="fas fa-eye"></i>';
+                    }
+                });
+            });
+
+            // ============================================
+            // MEDIDOR DE FUERZA DE CONTRASEÑA
+            // ============================================
+            var passwordInput = document.getElementById('password_nueva');
+            var strengthBar   = document.getElementById('strength-bar');
+            var strengthText  = document.getElementById('strength-text');
+            var passwordStrengthValue = 0;
+
+            if (passwordInput && strengthBar && strengthText) {
+                passwordInput.addEventListener('input', function () {
+                    var val = passwordInput.value;
+                    var strength = 0;
+
+                    if (val.length >= 8) strength += 1;
+                    if (/[a-z]+/.test(val)) strength += 1;
+                    if (/[A-Z]+/.test(val)) strength += 1;
+                    if (/[0-9]+/.test(val)) strength += 1;
+                    if (/[$@#&!%*?]/.test(val)) strength += 1;
+
+                    passwordStrengthValue = strength;
+
+                    var width  = (strength / 5) * 100;
+                    var color  = '#dc3545';
+                    var text   = 'Muy débil';
+
+                    if (strength === 2) {
+                        color = '#ffc107';
+                        text  = 'Débil';
+                    } else if (strength === 3) {
+                        color = '#17a2b8';
+                        text  = 'Aceptable';
+                    } else if (strength === 4) {
+                        color = '#28a745';
+                        text  = 'Fuerte';
+                    } else if (strength === 5) {
+                        color = '#1b5e20';
+                        text  = 'Muy fuerte';
+                    }
+
+                    strengthBar.style.width = width + '%';
+                    strengthBar.style.background = color;
+                    strengthText.textContent = text;
+                    strengthText.style.color = color;
+                });
+            }
+
+            // ============================================
+            // EDICIÓN DE PERFIL
+            // ============================================
+            window.toggleEditMode = function () {
+                var displays = document.querySelectorAll('.detail-display');
+                var edits    = document.querySelectorAll('.detail-edit');
+                var actions  = document.querySelector('.edit-actions');
+
+                displays.forEach(function (d) {
+                    d.style.display = (d.style.display === 'none') ? 'block' : 'none';
+                });
+                edits.forEach(function (e) {
+                    e.style.display = (e.style.display === 'none') ? 'block' : 'none';
+                });
+                if (actions) {
+                    actions.style.display = (actions.style.display === 'none') ? 'flex' : 'none';
+                }
+            };
+
+            // ============================================
+            // DESVANECER MENSAJES DE ALERTA
+            // ============================================
+            var alertPerfil   = document.getElementById('alertPerfil');
+            var alertPassword = document.getElementById('alertPassword');
+
+            if (alertPerfil) {
+                setTimeout(function () {
+                    alertPerfil.classList.add('fade-out');
+                    setTimeout(function () {
+                        alertPerfil.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            }
+
+            if (alertPassword) {
+                setTimeout(function () {
+                    alertPassword.classList.add('fade-out');
+                    setTimeout(function () {
+                        alertPassword.style.display = 'none';
+                    }, 500);
+                }, 3000);
+            }
+        });
+    })();
     </script>
+
 </body>
 </html>

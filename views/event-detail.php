@@ -661,33 +661,75 @@ if (empty($_SESSION['csrf_contact'])) {
     modal.classList.add('is-open');
     setTimeout(()=> document.getElementById('coNombre')?.focus(), 30);
   }
-  function closeModal(){ modal.classList.remove('is-open'); }
+  function closeModal(){ 
+    modal.classList.remove('is-open'); 
+  }
+
+  // --- Cerrar al hacer click fuera sin romper la selección de texto ---
+  let coMouseDownOnOverlay = false;
+
+  modal.addEventListener('mousedown', (e) => {
+    // Solo marcamos si el botón se ha pulsado directamente sobre el overlay,
+    // no dentro del contenido del modal.
+    coMouseDownOnOverlay = (e.target === modal);
+  });
+
+  modal.addEventListener('mouseup', (e) => {
+    // Cerramos solo si el mouse se pulsó y se soltó en el overlay.
+    if (coMouseDownOnOverlay && e.target === modal) {
+      closeModal();
+    }
+    coMouseDownOnOverlay = false;
+  });
 
   document.addEventListener('click', (e)=>{
     const trigger = e.target.closest('#btnContactOrganizer, .organizer-card .btn-contact');
-    if (trigger) { e.preventDefault(); openModal(trigger); return; }
-    if (e.target.id === 'coClose' || e.target.id === 'coCancel' || e.target === modal) {
-      e.preventDefault(); closeModal();
+    if (trigger) { 
+      e.preventDefault(); 
+      openModal(trigger); 
+      return; 
+    }
+
+    // Botón de cerrar o cancelar
+    if (e.target.id === 'coClose' || e.target.id === 'coCancel') {
+      e.preventDefault(); 
+      closeModal();
     }
   });
-  document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape' && modal.classList.contains('is-open')) closeModal(); });
+
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+      closeModal();
+    }
+  });
 
   form.addEventListener('submit', async (e)=>{
     e.preventDefault();
-    if (!form.checkValidity()) { form.reportValidity(); return; }
+    if (!form.checkValidity()) { 
+      form.reportValidity(); 
+      return; 
+    }
 
     const sendBtn = document.getElementById('coSend');
     sendBtn.disabled = true;
 
     try{
-      const res = await fetch(endpoint, { method:'POST', body:new FormData(form), credentials:'same-origin' });
+      const res = await fetch(endpoint, { 
+        method:'POST', 
+        body:new FormData(form), 
+        credentials:'same-origin' 
+      });
 
-      // Intenta leer JSON; si no, captura el texto para depurar
       let json, text;
-      try { json = await res.json(); } catch(_) { text = await res.text(); }
+      try { 
+        json = await res.json(); 
+      } catch(_) { 
+        text = await res.text(); 
+      }
 
       if (json?.ok) {
-        closeModal(); form.reset();
+        closeModal(); 
+        form.reset();
         if (toast) {
           toast.classList.add('is-visible');
           window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -697,10 +739,10 @@ if (empty($_SESSION['csrf_contact'])) {
         console.warn('[WF] Respuesta no OK', json || text);
         alert((json && json.msg) || 'No se pudo enviar el mensaje. Revisa los campos e inténtalo de nuevo.');
       }
-    }catch(err){
+    } catch(err){
       console.error('[WF] Error envío', err);
       alert('Ha ocurrido un error inesperado.');
-    }finally{
+    } finally{
       sendBtn.disabled = false;
     }
   });

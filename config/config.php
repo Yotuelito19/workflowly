@@ -132,12 +132,65 @@ function format_date($date) {
     return date('d/m/Y H:i', strtotime($date));
 }
 
+function time_ago($datetime): string {
+    if (empty($datetime)) {
+        return '';
+    }
+
+    // Acepta tanto timestamps como cadenas tipo '2025-11-26 20:15:00'
+    $timestamp = is_numeric($datetime) ? (int)$datetime : strtotime($datetime);
+    if ($timestamp === false) {
+        return '';
+    }
+
+    $diff = time() - $timestamp;
+    if ($diff < 0) {
+        $diff = 0; // por si alguna fecha viene "del futuro"
+    }
+
+    if ($diff < 60) {
+        return 'Hace unos segundos';
+    }
+
+    $minutes = floor($diff / 60);
+    if ($minutes < 60) {
+        return 'Hace ' . $minutes . ' minuto' . ($minutes === 1 ? '' : 's');
+    }
+
+    $hours = floor($diff / 3600);
+    if ($hours < 24) {
+        return 'Hace ' . $hours . ' hora' . ($hours === 1 ? '' : 's');
+    }
+
+    $days = floor($diff / 86400);
+    if ($days < 7) {
+        return 'Hace ' . $days . ' día' . ($days === 1 ? '' : 's');
+    }
+
+    $weeks = floor($days / 7);
+    if ($weeks < 5) {
+        return 'Hace ' . $weeks . ' semana' . ($weeks === 1 ? '' : 's');
+    }
+
+    $months = floor($days / 30);
+    if ($months < 12) {
+        return 'Hace ' . $months . ' mes' . ($months === 1 ? '' : 'es');
+    }
+
+    $years = floor($days / 365);
+    return 'Hace ' . $years . ' año' . ($years === 1 ? '' : 's');
+}
+
+
 // ===================================================================
-// === Helpers JSON globales y manejador de errores fatal-only ====
+// === Helpers JSON globales y manejador de errores (solo para /api) ====
 // ===================================================================
 
-// Evitar doble instalación
-if (!defined('JSON_HELPERS_INSTALLED')) {
+// Detectar si la petición actual es de la carpeta /api
+$isApiRequest = isset($_SERVER['REQUEST_URI']) && strpos($_SERVER['REQUEST_URI'], '/api/') !== false;
+
+// Evitar doble instalación y limitarlo solo a peticiones API
+if ($isApiRequest && !defined('JSON_HELPERS_INSTALLED')) {
     define('JSON_HELPERS_INSTALLED', true);
 
     /**
@@ -145,9 +198,11 @@ if (!defined('JSON_HELPERS_INSTALLED')) {
      */
     function json_success(array $payload, int $status = 200): void {
         if (ob_get_length()) ob_end_clean();
-        http_response_code($status);
-        header('Content-Type: application/json; charset=utf-8');
-        echo json_encode($payload, JSON_UNESCAPED_UNICODE);
+        if (!headers_sent()) {
+            http_response_code($status);
+            header('Content-Type: application/json; charset=utf-8');
+        }
+        echo json_encode(['ok' => true] + $payload, JSON_UNESCAPED_UNICODE);
         exit;
     }
 
@@ -156,14 +211,17 @@ if (!defined('JSON_HELPERS_INSTALLED')) {
      */
     function json_error(string $msg, int $status = 400, array $extra = []): void {
         if (ob_get_length()) ob_end_clean();
-        http_response_code($status);
-        header('Content-Type: application/json; charset=utf-8');
+        if (!headers_sent()) {
+            http_response_code($status);
+            header('Content-Type: application/json; charset=utf-8');
+        }
         echo json_encode(['ok' => false, 'error' => $msg] + $extra, JSON_UNESCAPED_UNICODE);
         exit;
     }
 
     /**
      * Manejador global para errores fatales (no interfiere con respuestas válidas)
+     * Solo para API: en vistas HTML se usa el manejador por defecto de PHP.
      */
     set_error_handler(function ($severity, $message, $file, $line) {
         throw new ErrorException($message, 0, $severity, $file, $line);
@@ -173,8 +231,10 @@ if (!defined('JSON_HELPERS_INSTALLED')) {
         $err = error_get_last();
         if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
             if (ob_get_length()) ob_end_clean();
-            http_response_code(500);
-            header('Content-Type: application/json; charset=utf-8');
+            if (!headers_sent()) {
+                http_response_code(500);
+                header('Content-Type: application/json; charset=utf-8');
+            }
             echo json_encode([
                 'ok' => false,
                 'error' => 'Fatal error',
