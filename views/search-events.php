@@ -238,9 +238,13 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
                                         <?php endif; ?>
                                         
                                         <!-- Botón favorito -->
-                                        <button class="favorite-btn" aria-label="Agregar a favoritos">
-                                            <i class="far fa-heart"></i>
-                                        </button>
+                                    <button class="favorite-btn" 
+                                            data-evento-id="<?php echo $evento['idEvento']; ?>" 
+                                            onclick="toggleFavorito(<?php echo $evento['idEvento']; ?>, this)"
+                                            aria-label="Agregar a favoritos">
+                                        <i class="far fa-heart"></i>
+                                    </button>
+
                                     </div>
                                     <div class="event-content">
                                         <!-- Categoría del evento -->
@@ -288,4 +292,84 @@ $tiposEventos = $stmtTipos->fetchAll(PDO::FETCH_COLUMN);
     <!-- Footer -->
     <?php include __DIR__ . '/../includes/footer.php'; ?>
 </body>
+
+<script>
+// Verificar favoritos al cargar la página
+document.addEventListener('DOMContentLoaded', () => {
+    <?php if (is_logged_in()): ?>
+    document.querySelectorAll('.favorite-btn').forEach(btn => {
+        const eventoId = btn.dataset.eventoId;
+        verificarFavorito(eventoId, btn);
+    });
+    <?php endif; ?>
+});
+
+function verificarFavorito(eventoId, btn) {
+    fetch(`../api/favoritos.php?accion=verificar&idEvento=${eventoId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.ok && data.esFavorito) {
+                btn.querySelector('i').classList.remove('far');
+                btn.querySelector('i').classList.add('fas');
+                btn.classList.add('active');
+            }
+        });
+}
+
+function toggleFavorito(eventoId, btn) {
+    <?php if (!is_logged_in()): ?>
+        window.location.href = 'login.php?redirect=search-events.php';
+        return;
+    <?php endif; ?>
+    
+    const icon = btn.querySelector('i');
+    const esFavorito = icon.classList.contains('fas');
+    const accion = esFavorito ? 'eliminar' : 'agregar';
+    
+    const formData = new FormData();
+    formData.append('idEvento', eventoId);
+    
+    fetch(`../api/favoritos.php?accion=${accion}`, {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            if (esFavorito) {
+                icon.classList.remove('fas');
+                icon.classList.add('far');
+                btn.classList.remove('active');
+            } else {
+                icon.classList.remove('far');
+                icon.classList.add('fas');
+                btn.classList.add('active');
+                // Animación
+                btn.style.transform = 'scale(1.2)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 200);
+            }
+        } else {
+            alert(data.error || 'Error al procesar favorito');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error al procesar favorito');
+    });
+}
+
+function changeSort(value) {
+    const url = new URL(window.location);
+    url.searchParams.set('orden', value);
+    window.location = url;
+}
+
+function resetPriceFilter() {
+    document.getElementById('precio_min').value = '';
+    document.getElementById('precio_max').value = '';
+    document.querySelector('form').submit();
+}
+</script>
 </html>

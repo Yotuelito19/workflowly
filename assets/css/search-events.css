@@ -818,3 +818,20 @@ body {
         gap: var(--spacing-xs);
     }
 }
+/* Botón favorito activo */
+.favorite-btn {
+    transition: all 0.3s ease;
+}
+
+.favorite-btn.active {
+    background: var(--accent-color);
+    color: var(--white);
+}
+
+.favorite-btn.active i {
+    color: var(--white);
+}
+
+.favorite-btn:hover {
+    transform: scale(1.1);
+}

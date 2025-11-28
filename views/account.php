@@ -109,6 +109,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
                 <a href="#tickets" class="tab-btn <?php echo $active_tab === 'tickets' ? 'active' : ''; ?>" onclick="showTab(event, 'tickets')">
                     <i class="fas fa-ticket-alt"></i> Mis Entradas
                 </a>
+                <a href="#favoritos" class="tab-btn <?php echo $active_tab === 'favoritos' ? 'active' : ''; ?>" onclick="showTab(event, 'favoritos')">
+        <i class="fas fa-heart"></i> Favoritos
+    </a>
                 <a href="#payments" class="tab-btn <?php echo $active_tab === 'payments' ? 'active' : ''; ?>" onclick="showTab(event, 'payments')">
                     <i class="fas fa-credit-card"></i> Pagos
                 </a>
@@ -165,6 +168,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
                         <a href="search-events.php" class="btn-primary">Buscar eventos</a>
                     </div>
                 <?php endif; ?>
+            </div>
+
+            <!-- Tab Favoritos / Wishlist -->
+            <div class="tab-content <?php echo $active_tab === 'favoritos' ? 'active' : ''; ?>" id="favoritos">
+                <div class="wishlist-header">
+                    <div>
+                        <h1>Mi Wishlist</h1>
+                        <p class="subtitle">Eventos que has guardado para más tarde</p>
+                    </div>
+                    <div class="wishlist-stats">
+                        <span id="totalFavoritos">0</span> eventos guardados
+                    </div>
+                </div>
+                <div id="favoritosContainer" class="loading-container">
+                </div>
+
             </div>
 
             <!-- Historial de Compras -->
@@ -698,21 +717,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
                 window.location.hash = '#' + tabId;
             }
         }
+ 
 
-        // Esta función la usa el HTML en onclick="showTab(event, 'profile')"
-        window.showTab = function (event, tabId) {
-            if (event && event.preventDefault) {
-                event.preventDefault();
-            }
-            activarTab(tabId);
-        };
+        /// Esta función la usa el HTML en onclick="showTab(event, 'profile')"
+window.showTab = function (event, tabId) {
+    if (event && event.preventDefault) {
+        event.preventDefault();
+    }
+
+    activarTab(tabId);
+
+    // Si el usuario abre la pestaña Favoritos, cargamos (solo una vez)
+    if (tabId === 'favoritos' && !favoritosCargados) {
+        console.log('🎯 Cargando favoritos desde showTab...');
+        cargarFavoritos();
+        favoritosCargados = true;
+    }
+};
+
 
         // Activar pestaña según el hash al cargar (por si venimos de #tickets, etc.)
-        document.addEventListener('DOMContentLoaded', function () {
-            var hash = window.location.hash ? window.location.hash.substring(1) : '';
-            if (hash) {
-                activarTab(hash);
-            }
+       document.addEventListener('DOMContentLoaded', function () {
+    var hash = window.location.hash ? window.location.hash.substring(1) : '';
+
+    // Si la URL viene con #algo, activar esa pestaña
+    if (hash) {
+        activarTab(hash);
+
+        if (hash === 'favoritos' && !favoritosCargados) {
+            console.log('🎯 Cargando favoritos desde DOMContentLoaded...');
+            cargarFavoritos();
+            favoritosCargados = true;
+        }
+    } else {
+        // Si no hay hash, por defecto perfil
+        activarTab('profile');
+    }
+
 
             // ============================================
             // MOSTRAR / OCULTAR FORMULARIO DE CAMBIO DE CONTRASEÑA
@@ -863,6 +904,324 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
             }
         });
     })();
+ // ============================================
+// GESTIÓN DE FAVORITOS
+// ============================================
+let favoritosCargados = false;
+
+function cargarFavoritos() {
+    const container = document.getElementById('favoritosContainer');
+    console.log('🔍 Iniciando carga de favoritos...');
+    
+    container.innerHTML = `
+        <div class="spinner">
+            <i class="fas fa-spinner fa-spin"></i>
+            <p>Cargando favoritos...</p>
+        </div>
+    `;
+    
+    fetch('../api/favoritos.php?accion=listar')
+        .then(response => {
+            console.log('📥 Respuesta recibida:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('✅ Datos parseados:', data);
+            
+            if (data.ok && data.favoritos && data.favoritos.length > 0) {
+                console.log(`📊 Total favoritos: ${data.favoritos.length}`);
+                document.getElementById('totalFavoritos').textContent = data.favoritos.length;
+                mostrarFavoritos(data.favoritos);
+            } else {
+                console.log('ℹ️ No hay favoritos');
+                document.getElementById('totalFavoritos').textContent = '0';
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <i class="fas fa-heart-broken"></i>
+                        <h3>No tienes eventos favoritos</h3>
+                        <p>Explora eventos increíbles y guárdalos aquí para encontrarlos fácilmente</p>
+                        <a href="search-events.php" class="btn-primary">
+                            <i class="fas fa-search"></i> Explorar eventos
+                        </a>
+                    </div>
+                `;
+            }
+        })
+        .catch(error => {
+            console.error('❌ Error:', error);
+            container.innerHTML = `
+                <div class="error-state">
+                    <i class="fas fa-exclamation-circle"></i>
+                    <h3>Error al cargar favoritos</h3>
+                    <p>${error.message}</p>
+                    <button class="btn-secondary" onclick="favoritosCargados=false; cargarFavoritos()">
+                        <i class="fas fa-redo"></i> Reintentar
+                    </button>
+                </div>
+            `;
+        });
+}
+
+function mostrarFavoritos(favoritos) {
+    const container = document.getElementById('favoritosContainer');
+    
+    let html = '<div class="events-grid-wishlist">';
+    
+    favoritos.forEach(evento => {
+        const fechaEvento = new Date(evento.fechaInicio).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        
+        const fechaAgregado = new Date(evento.fechaAgregado).toLocaleDateString('es-ES', {
+            day: '2-digit',
+            month: 'short',
+            year: 'numeric'
+        });
+        
+        // Calcular días hasta el evento
+        const hoy = new Date();
+        const fechaEv = new Date(evento.fechaInicio);
+        const diasHasta = Math.ceil((fechaEv - hoy) / (1000 * 60 * 60 * 24));
+        
+        // 🔴 MANEJO CORRECTO DE IMÁGENES
+        const imagenDefault = '<?php echo BASE_URL; ?>/api/admin/events/uploads/0b10db93db401e3d.jpg';
+        let imagenUrl = imagenDefault;
+        
+        // Solo intentar cargar imagen si existe y no es default
+        if (evento.imagenPrincipal && 
+            evento.imagenPrincipal !== 'default.jpg' && 
+            evento.imagenPrincipal !== 'imagen/default.jpg' &&
+            !evento.imagenPrincipal.includes('placeholder')) {
+            
+            const cleanPath = evento.imagenPrincipal.replace('uploads/', '');
+            imagenUrl = '<?php echo BASE_URL; ?>/api/admin/events/uploads/' + cleanPath;
+        }
+        
+        html += `
+            <div class="event-card-wishlist" data-evento-id="${evento.idEvento}">
+                <div class="event-image-wishlist">
+                    <img src="${imagenUrl}" 
+                         alt="${escapeHtml(evento.nombre)}" 
+                         onerror="this.src='${imagenDefault}'">
+                    
+                    ${diasHasta > 0 && diasHasta <= 7 ? `
+                        <span class="event-badge urgent">
+                            <i class="fas fa-clock"></i> ¡Pronto!
+                        </span>
+                    ` : ''}
+                    
+                    <span class="event-category-badge">${escapeHtml(evento.tipo)}</span>
+                    
+                    <button class="btn-remove-wishlist" onclick="eliminarFavorito(${evento.idEvento})" 
+                            title="Eliminar de favoritos">
+                        <i class="fas fa-heart"></i>
+                    </button>
+                </div>
+                
+                <div class="event-content-wishlist">
+                    <div class="event-header-wish">
+                        <h3>${escapeHtml(evento.nombre)}</h3>
+                        <span class="fecha-agregado" title="Agregado el ${fechaAgregado}">
+                            <i class="fas fa-bookmark"></i> ${fechaAgregado}
+                        </span>
+                    </div>
+                    
+                    <p class="event-description">${evento.descripcion ? escapeHtml(evento.descripcion.substring(0, 100)) + '...' : 'Sin descripción'}</p>
+                    
+                    <div class="event-meta-wishlist">
+                        <div class="meta-item-wish">
+                            <i class="fas fa-calendar-alt"></i>
+                            <span>${fechaEvento}</span>
+                        </div>
+                        <div class="meta-item-wish">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>${escapeHtml(evento.ubicacion)}</span>
+                        </div>
+                        <div class="meta-item-wish ${evento.entradasDisponibles < 50 ? 'low-stock' : ''}">
+                            <i class="fas fa-ticket-alt"></i>
+                            <span>${evento.entradasDisponibles} disponibles</span>
+                        </div>
+                    </div>
+                    
+                    <div class="event-footer-wishlist">
+                        <div class="price-wishlist">
+                            <span class="price-label">Desde</span>
+                            <span class="price-value">${formatPrice(evento.precio_desde || 0)}</span>
+                        </div>
+                        <div class="action-buttons">
+                            <a href="event-detail.php?id=${evento.idEvento}" class="btn-primary btn-sm">
+                                <i class="fas fa-eye"></i> Ver detalles
+                            </a>
+                            <button class="btn-secondary btn-sm" onclick="compartirEvento(${evento.idEvento}, '${escapeHtml(evento.nombre).replace(/'/g, "\\'")}')">
+                                <i class="fas fa-share-alt"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    });
+    
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function eliminarFavorito(idEvento) {
+    if (!confirm('¿Eliminar este evento de tus favoritos?')) {
+        return;
+    }
+    
+    const card = document.querySelector(`[data-evento-id="${idEvento}"]`);
+    if (card) {
+        card.style.opacity = '0.5';
+        card.style.pointerEvents = 'none';
+    }
+    
+    const formData = new FormData();
+    formData.append('idEvento', idEvento);
+    
+    fetch('../api/favoritos.php?accion=eliminar', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            // Animación de eliminación
+            if (card) {
+                card.style.transform = 'scale(0.8)';
+                card.style.opacity = '0';
+                
+                setTimeout(() => {
+                    card.remove();
+                    
+                    // Actualizar contador
+                    const totalElement = document.getElementById('totalFavoritos');
+                    const currentTotal = parseInt(totalElement.textContent);
+                    totalElement.textContent = currentTotal - 1;
+                    
+                    // Si no quedan más eventos, mostrar empty state
+                    const container = document.getElementById('favoritosContainer');
+                    if (!container.querySelector('.event-card-wishlist')) {
+                        container.innerHTML = `
+                            <div class="empty-state">
+                                <i class="fas fa-heart-broken"></i>
+                                <h3>No tienes eventos favoritos</h3>
+                                <p>Explora eventos increíbles y guárdalos aquí</p>
+                                <a href="search-events.php" class="btn-primary">
+                                    <i class="fas fa-search"></i> Explorar eventos
+                                </a>
+                            </div>
+                        `;
+                    }
+                }, 300);
+            }
+            
+            mostrarNotificacion('Evento eliminado de favoritos', 'success');
+        } else {
+            if (card) {
+                card.style.opacity = '1';
+                card.style.pointerEvents = 'auto';
+            }
+            mostrarNotificacion('Error al eliminar: ' + data.error, 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        if (card) {
+            card.style.opacity = '1';
+            card.style.pointerEvents = 'auto';
+        }
+        mostrarNotificacion('Error al eliminar favorito', 'error');
+    });
+}
+
+function compartirEvento(idEvento, nombre) {
+    const url = window.location.origin + '/workflowly/views/event-detail.php?id=' + idEvento;
+    
+    if (navigator.share) {
+        navigator.share({
+            title: nombre,
+            text: '¡Mira este evento increíble!',
+            url: url
+        }).catch(err => console.log('Error al compartir:', err));
+    } else {
+        // Fallback: copiar al portapapeles
+        navigator.clipboard.writeText(url).then(() => {
+            mostrarNotificacion('Enlace copiado al portapapeles', 'success');
+        }).catch(() => {
+            prompt('Copia este enlace:', url);
+        });
+    }
+}
+
+function mostrarNotificacion(mensaje, tipo) {
+    const notif = document.createElement('div');
+    notif.className = `notification notification-${tipo}`;
+    notif.innerHTML = `
+        <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <span>${mensaje}</span>
+    `;
+    notif.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: ${tipo === 'success' ? '#28a745' : '#dc3545'};
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        z-index: 10000;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        opacity: 0;
+        transform: translateY(-20px);
+        transition: all 0.3s ease;
+    `;
+    
+    document.body.appendChild(notif);
+    
+    setTimeout(() => {
+        notif.style.opacity = '1';
+        notif.style.transform = 'translateY(0)';
+    }, 100);
+    
+    setTimeout(() => {
+        notif.style.opacity = '0';
+        notif.style.transform = 'translateY(-20px)';
+        setTimeout(() => {
+            notif.remove();
+        }, 300);
+    }, 3000);
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('es-ES', {
+        style: 'currency',
+        currency: 'EUR'
+    }).format(price);
+}
+
+// Función helper para escapar HTML y prevenir XSS
+function escapeHtml(text) {
+    const map = {
+        '&': '&amp;',
+        '<': '&lt;',
+        '>': '&gt;',
+        '"': '&quot;',
+        "'": '&#039;'
+    };
+    return text.replace(/[&<>"']/g, m => map[m]);
+}
+
     </script>
 
 </body>
