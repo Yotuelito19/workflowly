@@ -7,6 +7,32 @@
 require_once 'config/config.php';
 require_once 'config/database.php';
 
+// Función helper para obtener la URL correcta de la imagen
+function getImageUrl($imagePath) {
+    // Si la imagen es default.jpg o no existe, usar placeholder
+    if (empty($imagePath) || $imagePath === 'default.jpg' || $imagePath === 'imagen/default.jpg') {
+        return BASE_URL . '/api/admin/events/uploads/0b10db93db401e3d.jpg';
+    }
+    
+    // Limpiar la ruta: quitar 'uploads/' si existe para evitar duplicación
+    $cleanPath = str_replace('uploads/', '', $imagePath);
+    
+    // Verificar si la imagen existe en /uploads/ (carpeta principal)
+    $mainUploadPath = UPLOADS_PATH . '/' . $cleanPath;
+    if (file_exists($mainUploadPath)) {
+        return UPLOADS_URL . '/' . $cleanPath;
+    }
+    
+    // Verificar si existe en /api/admin/events/uploads/
+    $adminUploadPath = BASE_PATH . '/api/admin/events/uploads/' . $cleanPath;
+    if (file_exists($adminUploadPath)) {
+        return BASE_URL . '/api/admin/events/uploads/' . $cleanPath;
+    }
+    
+    // Si no existe en ningún lado, retornar placeholder
+    return BASE_URL . '/api/admin/events/uploads/0b10db93db401e3d.jpg';
+}
+
 // Verificar timeout de sesión
 if (is_logged_in()) {
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > SESSION_TIMEOUT)) {
@@ -93,7 +119,7 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                 foreach ($eventosHero as $evento): 
                 ?>
                     <a href="views/event-detail.php?id=<?php echo $evento['idEvento']; ?>" class="event-card">
-                        <div class="event-image" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                        <div class="event-image" style="background-image: url('<?php echo getImageUrl($evento['imagenPrincipal']); ?>'); background-size: cover; background-position: center;"></div>
                         <div class="event-info">
                             <h4><?php echo htmlspecialchars(substr($evento['nombre'], 0, 30)); ?></h4>
                             <p>Desde <?php echo format_price($evento['precio_desde'] ?? 25); ?></p>
@@ -114,7 +140,12 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
             <div class="events-grid">
                 <?php foreach ($eventos as $evento): ?>
                     <div class="event-item">
-                        <div class="event-img" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);"></div>
+                        <div class="event-img">
+                            <img src="<?php echo getImageUrl($evento['imagenPrincipal']); ?>" 
+                                 alt="<?php echo htmlspecialchars($evento['nombre']); ?>"
+                                 onerror="this.src='<?php echo BASE_URL; ?>/api/admin/events/uploads/0b10db93db401e3d.jpg'"
+                                 style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
                         <div class="event-content">
                             <span class="event-category"><?php echo htmlspecialchars($evento['tipo']); ?></span>
                             <h3><?php echo htmlspecialchars($evento['nombre']); ?></h3>

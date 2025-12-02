@@ -82,7 +82,7 @@ if (empty($_SESSION['csrf_contact'])) {
     <!-- Event Hero -->
     <section class="event-hero">
         <div class="hero-background">
-            <div class="hero-image" style="background-image: url('<?= UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>');"></div>
+            <div class="hero-image" style="background-image: url('<?= UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>"></div>
             <div class="hero-overlay"></div>
         </div>
         <div class="container">
