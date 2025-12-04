@@ -110,9 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="container">
             <div class="nav-brand">
                 <a href="../index.php" class="logo">
-                    <div class="logo-circle">
-                        <span>W</span>
-                    </div>
+                    <img src="../assets/images/logo.png" alt="WorkFlowly" class="logo-image">
                     <span class="brand-name">WorkFlowly</span>
                 </a>
             </div>
@@ -130,9 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="auth-branding">
                     <div class="branding-content">
                         <div class="brand-logo">
-                            <div class="logo-circle large">
-                                <span>W</span>
-                            </div>
+                            <img src="../assets/images/logo.png" alt="WorkFlowly" class="logo-image-large">
                             <h1>WorkFlowly</h1>
                         </div>
                         <h2>Tu plataforma de eventos de confianza</h2>

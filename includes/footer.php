@@ -9,9 +9,7 @@
         <div class="footer-content">
             <div class="footer-section">
                 <div class="logo">
-                    <div class="logo-circle">
-                        <span>W</span>
-                    </div>
+                    <img src="<?php echo BASE_URL; ?>/assets/images/logo.png" alt="WorkFlowly" class="logo-image">
                     <span class="brand-name">WorkFlowly</span>
                 </div>
                 <p>Tu plataforma de confianza para comprar entradas sin reventa.</p>

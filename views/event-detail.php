@@ -81,63 +81,71 @@ if (empty($_SESSION['csrf_contact'])) {
 
     <!-- Event Hero -->
     <section class="event-hero">
-        <div class="hero-background">
-            <div class="hero-image" style="background-image: url('<?= UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>"></div>
-            <div class="hero-overlay"></div>
-        </div>
         <div class="container">
-            <div class="hero-content">
-                <div class="event-badges">
-                    <span class="badge category"><?= htmlspecialchars($evento['tipo']); ?></span>
-                    <?php if ($evento['entradasDisponibles'] < 100): ?>
-                        <span class="badge trending">¡Últimas entradas!</span>
-                    <?php endif; ?>
+            <div class="hero-layout">
+                <!-- Imagen del evento -->
+                <div class="hero-image-container">
+                    <img src="<?= UPLOADS_URL . '/' . $evento['imagenPrincipal']; ?>" 
+                         alt="<?= htmlspecialchars($evento['nombre']); ?>"
+                         class="event-main-image">
                 </div>
-                <h1><?= htmlspecialchars($evento['nombre']); ?></h1>
-                <div class="event-meta">
-                    <div class="meta-item">
-                        <i class="fas fa-calendar"></i>
-                        <div>
-                            <strong><?= date('d M Y', strtotime($evento['fechaInicio'])); ?></strong>
-                            <span><?= date('l, H:i', strtotime($evento['fechaInicio'])); ?></span>
+                
+                <!-- Información del evento -->
+                <div class="hero-info">
+                    <div class="event-badges">
+                        <span class="badge category"><?= htmlspecialchars($evento['tipo']); ?></span>
+                        <?php if ($evento['entradasDisponibles'] < 100): ?>
+                            <span class="badge trending">¡Últimas entradas!</span>
+                        <?php endif; ?>
+                    </div>
+                    
+                    <h1><?= htmlspecialchars($evento['nombre']); ?></h1>
+                    
+                    <div class="event-meta">
+                        <div class="meta-item">
+                            <i class="fas fa-calendar"></i>
+                            <div>
+                                <strong><?= date('d M Y', strtotime($evento['fechaInicio'])); ?></strong>
+                                <span><?= date('l, H:i', strtotime($evento['fechaInicio'])); ?></span>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <div>
+                                <?php
+                                if (!empty($evento['lugar_nombre'])) {
+                                    $tituloLugar = $evento['lugar_nombre'];
+                                    $subLugar = trim(($evento['lugar_ciudad'] ?? '') . ', ' . ($evento['lugar_pais'] ?? ''), ' ,');
+                                } else {
+                                    $tituloLugar = $evento['ubicacion'];
+                                    $subLugar = 'España';
+                                }
+                                ?>
+                                <strong><?= htmlspecialchars($tituloLugar); ?></strong>
+                                <?php if ($subLugar): ?>
+                                    <span><?= htmlspecialchars($subLugar); ?></span>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                        <div class="meta-item">
+                            <i class="fas fa-ticket-alt"></i>
+                            <div>
+                                <strong><?= (int)$evento['entradasDisponibles']; ?> disponibles</strong>
+                                <span>de <?= (int)$evento['aforoTotal']; ?> totales</span>
+                            </div>
                         </div>
                     </div>
-                    <div class="meta-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <?php
-                            
-                            if (!empty($evento['lugar_nombre'])) {
-                                $tituloLugar = $evento['lugar_nombre'];
-                                $subLugar = trim(($evento['lugar_ciudad'] ?? '') . ', ' . ($evento['lugar_pais'] ?? ''), ' ,');
-                            } else {
-                                $tituloLugar = $evento['ubicacion'];
-                                $subLugar = 'España';
-                            }
-                            ?>
-                            <strong><?= htmlspecialchars($tituloLugar); ?></strong>
-                            <?php if ($subLugar): ?>
-                                <span><?= htmlspecialchars($subLugar); ?></span>
-                            <?php endif; ?>
-                        </div>
+                    
+                    <div class="hero-actions">
+                        <button class="btn-favorite">
+                            <i class="far fa-heart"></i>
+                            Guardar evento
+                        </button>
+                        <button class="btn-share">
+                            <i class="fas fa-share-alt"></i>
+                            Compartir
+                        </button>
                     </div>
-                    <div class="meta-item">
-                        <i class="fas fa-ticket-alt"></i>
-                        <div>
-                            <strong><?= (int)$evento['entradasDisponibles']; ?> disponibles</strong>
-                            <span>de <?= (int)$evento['aforoTotal']; ?> totales</span>
-                        </div>
-                    </div>
-                </div>
-                <div class="hero-actions">
-                    <button class="btn-favorite">
-                        <i class="far fa-heart"></i>
-                        Guardar evento
-                    </button>
-                    <button class="btn-share">
-                        <i class="fas fa-share-alt"></i>
-                        Compartir
-                    </button>
                 </div>
             </div>
         </div>

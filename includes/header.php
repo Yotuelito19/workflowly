@@ -8,9 +8,7 @@
     <div class="container">
         <div class="nav-brand">
             <a href="<?php echo BASE_URL; ?>/index.php" class="logo">
-                <div class="logo-circle">
-                    <span>W</span>
-                </div>
+                <img src="<?php echo BASE_URL; ?>/assets/images/logo.png" alt="WorkFlowly" class="logo-image">
                 <span class="brand-name">WorkFlowly</span>
             </a>
         </div>
