@@ -140,9 +140,7 @@ body {
 
 /* Event Hero */
 .event-hero {
-    background: linear-gradient(135deg, #4CAF50 0%, #45a049 50%, #388E3C 100%);
-    padding: var(--spacing-xl) 0;
-    margin-top: 20px;
+    background: linear-gradient(135deg, #9CCC65 0%, #66BB6A 50%, #4CAF50 100%);
 }
 
 .hero-layout {
