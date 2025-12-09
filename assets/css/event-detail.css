@@ -1000,3 +1000,84 @@ body {
         justify-content: center;
     }
 }
+/* ===== Contact Organizer (añadidos) ===== */
+
+.contact-toast{
+  display:none;
+  margin: var(--spacing-sm) auto;
+  max-width: var(--container-width);
+  padding: 12px 16px;
+  border-radius: var(--border-radius);
+  background:#e8f5e9;
+  color:#1b5e20;
+  border:1px solid #c8e6c9;
+  box-shadow: var(--shadow-small);
+}
+.contact-toast.is-visible{ display:block; }
+
+/* Backdrop + dialog */
+.co-modal{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,.5);
+  display:none;
+  align-items:center; justify-content:center;
+  z-index:1000;
+}
+.co-modal.is-open{ display:flex; }
+
+.co-dialog{
+  width:min(680px,92vw);
+  background: var(--white);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow-large);
+  overflow:hidden;
+}
+
+/* Header */
+.co-head{
+  padding:18px 20px;
+  border-bottom:1px solid var(--gray-200);
+  display:flex; justify-content:space-between; align-items:center;
+}
+.co-title{
+  margin:0; font-size:1.15rem; color:var(--text-dark); font-weight:700;
+}
+.co-close{
+  background:none; border:0; font-size:1.5rem; line-height:1; cursor:pointer;
+}
+
+/* Body */
+.co-body{ padding:18px 20px; background: var(--gray-100); }
+.co-grid{ display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+.co-grid .full{ grid-column:1/-1; }
+.co-field label{ display:block; font-size:.9rem; color:var(--text-light); margin-bottom:6px; }
+.co-field input, .co-field textarea{
+  width:100%; padding:10px 12px;
+  border:1px solid var(--gray-300);
+  border-radius: var(--border-radius-small);
+  font:inherit; background: var(--white);
+}
+.co-field textarea{ min-height:140px; resize:vertical; }
+
+/* Footer */
+.co-foot{
+  padding:16px 20px;
+  display:flex; gap:10px; justify-content:flex-end;
+  background: var(--white);
+  border-top:1px solid var(--gray-200);
+}
+.co-btn{
+  padding:10px 14px; border-radius: var(--border-radius-small);
+  border:0; cursor:pointer; font-weight:600;
+  transition: .2s ease;
+}
+.co-btn:disabled{ opacity:.6; cursor:not-allowed; }
+.co-btn-secondary{ background:#eef2f3; color:var(--text-dark); }
+.co-btn-secondary:hover{ transform: translateY(-1px); }
+.co-btn-accent{ background: var(--primary-color); color: var(--white); }
+.co-btn-accent:hover{ background: var(--primary-dark); transform: translateY(-1px); }
+
+/* Responsive */
+@media (max-width: 640px){
+  .co-grid{ grid-template-columns:1fr; }
+}

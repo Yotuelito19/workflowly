@@ -5,7 +5,7 @@
 
 require_once '../config/config.php';
 require_once '../config/database.php';
-require_once '../models/Evento.php'; // 💡 lo añadimos
+require_once '../models/Evento.php'; 
 
 // Obtener ID del evento
 $idEvento = isset($_GET['id']) ? (int)$_GET['id'] : 0;
@@ -19,7 +19,7 @@ $database = new Database();
 $db = $database->getConnection();
 $eventoModel = new Evento($db);
 
-// 💡 ahora usamos el método nuevo
+
 $evento = $eventoModel->obtenerDetalleCompleto($idEvento);
 
 if (!$evento) {
@@ -29,7 +29,7 @@ if (!$evento) {
 // Obtener tipos de entrada disponibles
 $tiposEntrada = $eventoModel->obtenerTiposEntrada($idEvento);
 
-// 💡 intentamos leer políticas, pero sin romper si no hay tabla
+
 $politicas = [];
 try {
     $stmtPol = $db->prepare("SELECT categoria, titulo, descripcion
@@ -42,19 +42,29 @@ try {
     $politicas = [];
 }
 ?>
+<?php
+if (session_status() === PHP_SESSION_NONE) session_start();
+if (empty($_SESSION['csrf_contact'])) {
+  $_SESSION['csrf_contact'] = bin2hex(random_bytes(32));
+}
+?>
+
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><?= htmlspecialchars($evento['nombre']); ?> - WorkFlowly</title>
-    <!-- 👇 ajusta esta ruta a tu entorno -->
+    
     <link rel="stylesheet" href="../assets/css/event-detail.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 </head>
 <body>
     <!-- Header -->
     <?php include __DIR__ . '/../includes/header.php'; ?>
+<div id="contactToast" class="contact-toast" aria-live="polite">
+  ¡Hemos recibido tu mensaje! Te responderemos lo antes posible.
+</div>
 
     <!-- Breadcrumbs -->
     <nav class="breadcrumbs">
@@ -96,7 +106,7 @@ try {
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
                             <?php
-                            // 💡 si hay lugar en BD, lo usamos
+                            
                             if (!empty($evento['lugar_nombre'])) {
                                 $tituloLugar = $evento['lugar_nombre'];
                                 $subLugar = trim(($evento['lugar_ciudad'] ?? '') . ', ' . ($evento['lugar_pais'] ?? ''), ' ,');
@@ -163,7 +173,7 @@ try {
                                 <p class="venue-address">
                                     <i class="fas fa-map-marker-alt"></i>
                                     <?php
-                                    // 💡 prioridad: dirección del lugar, si no ciudad/pais, si no el texto que tenías
+                                    
                                     if (!empty($evento['lugar_direccion'])) {
                                         echo htmlspecialchars($evento['lugar_direccion']);
                                     } elseif (!empty($evento['lugar_ciudad']) || !empty($evento['lugar_pais'])) {
@@ -235,7 +245,7 @@ try {
                                     if (!empty($evento['org_nombre'])) {
                                         echo htmlspecialchars(trim($evento['org_nombre'] . ' ' . ($evento['org_apellidos'] ?? '')));
                                     } else {
-                                        // lo que ya tenías: viene del join con Usuario en tu método viejo
+                                        
                                         echo htmlspecialchars(($evento['organizador_nombre'] ?? 'Organizador') . ' ' . ($evento['organizador_apellidos'] ?? ''));
                                     }
                                     ?>
@@ -254,11 +264,18 @@ try {
                                         <strong><?= (int)($evento['org_total_asistentes'] ?? 120000); ?></strong> asistentes
                                     </span>
                                 </div>
-                                <?php
+                               <?php
                                 $mailOrg = $evento['org_email'] ?? $evento['organizador_email'] ?? '';
                                 if (!empty($mailOrg)): ?>
-                                    <a href="mailto:<?= htmlspecialchars($mailOrg); ?>" class="btn-contact">Contactar</a>
+                                <button type="button"
+                                        class="btn-contact"
+                                        id="btnContactOrganizer"
+                                        data-organizer-email="<?= htmlspecialchars($mailOrg); ?>"
+                                        data-organizer-id="<?= (int)($evento['idOrganizador'] ?? 0); ?>">
+                                    Contactar
+                                </button>
                                 <?php endif; ?>
+
                             </div>
                         </div>
                     </div>
@@ -269,7 +286,7 @@ try {
                         <div class="policies-content">
                             <?php if (!empty($politicas)): ?>
                                 <?php
-                                // agrupamos por categoría como tus 4 columnas
+                                // agrupamos por categoría 
                                 $porCat = [];
                                 foreach ($politicas as $p) {
                                     $cat = $p['categoria'] ?: 'Información';
@@ -297,7 +314,7 @@ try {
                                     </div>
                                 <?php endforeach; ?>
                             <?php else: ?>
-                                <!-- 👇 lo que tenías antes -->
+                               
                                 <div class="policy-section">
                                     <h3><i class="fas fa-ticket-alt"></i> Entradas</h3>
                                     <ul>
@@ -345,36 +362,45 @@ try {
                         <div class="card-header">
                             <h3>Selecciona tus entradas</h3>
                             <?php
-                            // Porcentaje de disponibilidad respecto al AFORO TOTAL del evento
                             $sumDisponibles = 0;
                             foreach (($tiposEntrada ?? []) as $t) {
                                 $sumDisponibles += (int)($t['disponibles'] ?? 0);
                             }
 
                             $aforoTotal = (int)($evento['aforoTotal'] ?? 0);
-                            $percentLeft = ($aforoTotal > 0)
-                                ? (int)round(($sumDisponibles / $aforoTotal) * 100)
-                                : 0;
 
-                            // Umbrales por porcentaje 
-                            if ($percentLeft <= 0) {
+                          
+                            $percentLeftFloat = ($aforoTotal > 0) ? ($sumDisponibles / $aforoTotal * 100) : 0.0;
+
+                            
+                            if ($sumDisponibles === 0) {
+                                $percentText = '0%';
+                            } elseif ($percentLeftFloat < 1) {
+                                $percentText = '<1%';
+                            } else {
+                                $percentText = (string)round($percentLeftFloat) . '%';
+                            }
+
+                            // UMBRALES por % 
+                            if ($sumDisponibles === 0) {
                                 $stockClass = 'soldout';
                                 $stockText  = 'Entradas agotadas';
-                            } elseif ($percentLeft <= 10) {
+                            } elseif ($percentLeftFloat <= 10) {
                                 $stockClass = 'low';
-                                $stockText  = '¡Últimas entradas! (' . $percentLeft . '%)';
-                            } elseif ($percentLeft <= 35) {
+                                $stockText  = '¡Últimas entradas! (' . $percentText . ')';
+                            } elseif ($percentLeftFloat <= 35) {
                                 $stockClass = 'medium';
-                                $stockText  = 'Entradas limitadas (' . $percentLeft . '%)';
+                                $stockText  = 'Entradas limitadas (' . $percentText . ')';
                             } else {
                                 $stockClass = 'available';
-                                $stockText  = 'Entradas disponibles (' . $percentLeft . '%)';
+                                $stockText  = 'Entradas disponibles (' . $percentText . ')';
                             }
                             ?>
                             <div class="availability-status">
-                                <span class="status-indicator <?php echo $stockClass; ?>"></span>
-                                <span><?php echo $stockText; ?></span>
+                            <span class="status-indicator <?php echo $stockClass; ?>"></span>
+                            <span><?php echo $stockText; ?></span>
                             </div>
+
 
 
                         <?php if (!empty($tiposEntrada)): ?>
@@ -404,7 +430,7 @@ try {
                                         <div class="ticket-purchase">
                                             <div class="price-info">
                                                 <span class="price"><?php echo format_price($tipo['precio']); ?></span>
-                                                <!-- Si manejas gastos, muéstralos aquí -->
+                                               
                                                 <?php if (isset($tipo['gastos'])): ?>
                                                     <span class="taxes">+ <?php echo format_price($tipo['gastos']); ?> gastos</span>
                                                 <?php endif; ?>
@@ -415,7 +441,7 @@ try {
                                                 <button type="button" class="qty-btn minus" onclick="decreaseQuantity(<?php echo $id; ?>)">-</button>
                                                 <span class="quantity" id="qty_label_<?php echo $id; ?>">0</span>
 
-                                                <!-- Input real (usado por tu JS y el form). Lo escondemos visualmente. -->
+                                               
                                                 <input
                                                     type="number"
                                                     id="qty_<?php echo $id; ?>"
@@ -503,6 +529,66 @@ try {
             </div>
         </div>
     </section>
+    <div
+        class="co-modal"
+        id="contactOrganizerModal"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="contactOrganizerTitle"
+        data-api-endpoint="<?= BASE_URL ?>/api/contact/contact_organizer.php"
+        >
+        <div class="co-dialog">
+            <div class="co-head">
+            <h3 class="co-title" id="contactOrganizerTitle">Contactar con el organizador</h3>
+            <button class="co-close" id="coClose" aria-label="Cerrar">×</button>
+            </div>
+
+            <form id="contactOrganizerForm" class="co-body" novalidate>
+            <div class="co-grid">
+                <div class="co-field">
+                <label for="coNombre">Nombre *</label>
+                <input type="text" id="coNombre" name="nombre" required
+                        value="<?= htmlspecialchars($_SESSION['nombre'] ?? '') ?>">
+                </div>
+
+                <div class="co-field">
+                <label for="coApellidos">Apellidos *</label>
+                <input type="text" id="coApellidos" name="apellidos" required>
+                </div>
+
+              <div class="co-field">
+                <label for="coEmail">Tu correo electrónico *</label>
+                <input type="email" id="coEmail" name="email" required
+                        placeholder="tucorreo@ejemplo.com"
+                        value="<?= htmlspecialchars($_SESSION['email'] ?? '') ?>">
+                </div>
+
+
+
+                <div class="co-field">
+                <label for="coPedido">Número de pedido (opcional)</label>
+                <input type="text" id="coPedido" name="num_pedido" placeholder="Ej.: 12345">
+                </div>
+
+                <div class="co-field full">
+                <label for="coDesc">Descripción de lo que pasa *</label>
+                <textarea id="coDesc" name="descripcion" required minlength="10"
+                            placeholder="Cuéntanos el problema con detalle"></textarea>
+                </div>
+            </div>
+
+            <!-- Hidden -->
+            <input type="hidden" name="evento_id" value="<?= (int)$idEvento ?>">
+            <input type="hidden" name="organizer_email" id="coOrgEmail" value="">
+            <input type="hidden" name="organizer_id" id="coOrgId" value="">
+            </form>
+
+            <div class="co-foot">
+            <button type="button" class="co-btn co-btn-secondary" id="coCancel">Cancelar</button>
+            <button type="submit" form="contactOrganizerForm" class="co-btn co-btn-accent" id="coSend">Enviar</button>
+            </div>
+        </div>
+        </div>
 
     <!-- Footer -->
     <?php include __DIR__ . '/../includes/footer.php'; ?>
@@ -559,6 +645,111 @@ try {
         updateTotal();
     }
 }
+(function () {
+  const modal    = document.getElementById('contactOrganizerModal');
+  const form     = document.getElementById('contactOrganizerForm');
+  const toast    = document.getElementById('contactToast');
+  const orgEmail = document.getElementById('coOrgEmail');
+  const orgId    = document.getElementById('coOrgId');
+
+  if (!modal || !form) return;
+  const endpoint = modal.dataset.apiEndpoint || '/api/contact/contact_organizer.php';
+
+  function openModal(btn){
+    if (btn?.dataset?.organizerEmail) orgEmail.value = btn.dataset.organizerEmail;
+    if (btn?.dataset?.organizerId)    orgId.value    = btn.dataset.organizerId;
+    modal.classList.add('is-open');
+    setTimeout(()=> document.getElementById('coNombre')?.focus(), 30);
+  }
+  function closeModal(){ 
+    modal.classList.remove('is-open'); 
+  }
+
+  // --- Cerrar al hacer click fuera sin romper la selección de texto ---
+  let coMouseDownOnOverlay = false;
+
+  modal.addEventListener('mousedown', (e) => {
+    // Solo marcamos si el botón se ha pulsado directamente sobre el overlay,
+    // no dentro del contenido del modal.
+    coMouseDownOnOverlay = (e.target === modal);
+  });
+
+  modal.addEventListener('mouseup', (e) => {
+    // Cerramos solo si el mouse se pulsó y se soltó en el overlay.
+    if (coMouseDownOnOverlay && e.target === modal) {
+      closeModal();
+    }
+    coMouseDownOnOverlay = false;
+  });
+
+  document.addEventListener('click', (e)=>{
+    const trigger = e.target.closest('#btnContactOrganizer, .organizer-card .btn-contact');
+    if (trigger) { 
+      e.preventDefault(); 
+      openModal(trigger); 
+      return; 
+    }
+
+    // Botón de cerrar o cancelar
+    if (e.target.id === 'coClose' || e.target.id === 'coCancel') {
+      e.preventDefault(); 
+      closeModal();
+    }
+  });
+
+  document.addEventListener('keydown', (e)=>{
+    if (e.key === 'Escape' && modal.classList.contains('is-open')) {
+      closeModal();
+    }
+  });
+
+  form.addEventListener('submit', async (e)=>{
+    e.preventDefault();
+    if (!form.checkValidity()) { 
+      form.reportValidity(); 
+      return; 
+    }
+
+    const sendBtn = document.getElementById('coSend');
+    sendBtn.disabled = true;
+
+    try{
+      const res = await fetch(endpoint, { 
+        method:'POST', 
+        body:new FormData(form), 
+        credentials:'same-origin' 
+      });
+
+      let json, text;
+      try { 
+        json = await res.json(); 
+      } catch(_) { 
+        text = await res.text(); 
+      }
+
+      if (json?.ok) {
+        closeModal(); 
+        form.reset();
+        if (toast) {
+          toast.classList.add('is-visible');
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+          setTimeout(()=> toast.classList.remove('is-visible'), 6000);
+        }
+      } else {
+        console.warn('[WF] Respuesta no OK', json || text);
+        alert((json && json.msg) || 'No se pudo enviar el mensaje. Revisa los campos e inténtalo de nuevo.');
+      }
+    } catch(err){
+      console.error('[WF] Error envío', err);
+      alert('Ha ocurrido un error inesperado.');
+    } finally{
+      sendBtn.disabled = false;
+    }
+  });
+})();
     </script>
+   
+
+
 </body>
 </html>
