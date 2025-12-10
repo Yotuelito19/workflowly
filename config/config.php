@@ -26,7 +26,7 @@ define('LOGS_PATH', BASE_PATH . '/logs');
 // URLs base
 define('BASE_URL', 'http://localhost/workflowly');
 define('ASSETS_URL', BASE_URL . '/assets');
-define('UPLOADS_URL', BASE_URL . '/uploads');
+define('UPLOADS_URL', BASE_URL . '/api/admin/events');
 
 // Configuración de seguridad
 define('PASSWORD_HASH_ALGO', PASSWORD_BCRYPT);

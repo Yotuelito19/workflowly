@@ -64,6 +64,12 @@
     font-size: 18px;
 }
 
+.logo-image {
+    width: 40px;
+    height: 40px;
+    display: block;
+}
+
 .brand-name {
     font-size: 24px;
     font-weight: 700;
@@ -211,6 +217,11 @@
         width: 36px;
         height: 36px;
         font-size: 16px;
+    }
+
+    .logo-image {
+        width: 36px;
+        height: 36px;
     }
 }
 
