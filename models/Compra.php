@@ -112,27 +112,22 @@ class Compra {
      * Actualizar disponibilidad de entradas
      */
     private function actualizarDisponibilidad($idTipoEntrada, $cantidad) {
-        // Actualizar tipo de entrada
-        $query = "UPDATE TipoEntrada 
-                  SET cantidadDisponible = cantidadDisponible - :cantidad
-                  WHERE idTipoEntrada = :idTipoEntrada";
+    // IMPORTANTE:
+    // TipoEntrada.cantidadDisponible ya se actualiza en el trigger
+    // after_detallecompra_insert de la BD.
+    // Aquí solo actualizamos las entradasDisponibles del Evento.
 
-        $stmt = $this->conn->prepare($query);
-        $stmt->bindParam(':cantidad', $cantidad);
-        $stmt->bindParam(':idTipoEntrada', $idTipoEntrada);
-        $stmt->execute();
+    $query2 = "UPDATE Evento e
+               INNER JOIN TipoEntrada te ON e.idEvento = te.idEvento
+               SET e.entradasDisponibles = e.entradasDisponibles - :cantidad
+               WHERE te.idTipoEntrada = :idTipoEntrada";
 
-        // Actualizar evento
-        $query2 = "UPDATE Evento e
-                   INNER JOIN TipoEntrada te ON e.idEvento = te.idEvento
-                   SET e.entradasDisponibles = e.entradasDisponibles - :cantidad
-                   WHERE te.idTipoEntrada = :idTipoEntrada";
+    $stmt2 = $this->conn->prepare($query2);
+    $stmt2->bindParam(':cantidad', $cantidad);
+    $stmt2->bindParam(':idTipoEntrada', $idTipoEntrada);
+    $stmt2->execute();
+}
 
-        $stmt2 = $this->conn->prepare($query2);
-        $stmt2->bindParam(':cantidad', $cantidad);
-        $stmt2->bindParam(':idTipoEntrada', $idTipoEntrada);
-        $stmt2->execute();
-    }
 
     /**
      * Obtener compras de un usuario

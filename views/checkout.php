@@ -296,18 +296,52 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
                             
                             <div class="form-group">
                                 <label>Número de tarjeta</label>
-                                <input type="text" placeholder="1234 5678 9012 3456" maxlength="19" required>
+                                <input
+                                    type="text"
+                                    name="numero_tarjeta"
+                                    id="numero_tarjeta"
+                                    placeholder="1234 5678 9012 3456"
+                                    maxlength="19"
+                                    inputmode="numeric"
+                                    autocomplete="cc-number"
+                                    required
+                                    pattern="\d{4} \d{4} \d{4} \d{4}"
+                                    oninput="formatCardNumber(this)"
+                                >
                             </div>
                             <div class="form-row">
                                 <div class="form-group">
                                     <label>Fecha de expiración</label>
-                                    <input type="text" placeholder="MM/AA" maxlength="5" required>
+                                    <input
+                                        type="text"
+                                        name="fecha_expiracion"
+                                        id="fecha_expiracion"
+                                        placeholder="MM/AA"
+                                        maxlength="5"
+                                        inputmode="numeric"
+                                        autocomplete="cc-exp"
+                                        required
+                                        pattern="(0[1-9]|1[0-2])\/\d{2}"
+                                        oninput="formatExpiry(this)"
+                                    >
                                 </div>
                                 <div class="form-group">
                                     <label>CVV</label>
-                                    <input type="text" placeholder="123" maxlength="3" required>
+                                    <input
+                                        type="text"
+                                        name="cvv"
+                                        id="cvv"
+                                        placeholder="123"
+                                        maxlength="3"
+                                        inputmode="numeric"
+                                        autocomplete="cc-csc"
+                                        required
+                                        pattern="\d{3}"
+                                        oninput="formatCVV(this)"
+                                    >
                                 </div>
                             </div>
+
                         </div>
                         <br>
 
@@ -445,6 +479,65 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
         }
         tick();
     })();
-    </script>
+    function onlyDigits(value) {
+    return value.replace(/\D/g, '');
+}
+
+        function formatCardNumber(el) {
+            let value = onlyDigits(el.value).slice(0, 16); // máximo 16 dígitos
+            let groups = value.match(/.{1,4}/g);
+            el.value = groups ? groups.join(' ') : '';
+        }
+
+        function formatExpiry(el) {
+    let value = onlyDigits(el.value).slice(0, 4); // MMYY
+
+    // Formateo visual (MM/YY)
+    if (value.length >= 3) {
+        el.value = value.slice(0, 2) + '/' + value.slice(2);
+    } else {
+        el.value = value;
+    }
+
+    // Validación únicamente cuando MMYY está completo
+    if (value.length === 4) {
+        const mm = parseInt(value.slice(0, 2));
+        const yy = parseInt(value.slice(2));
+
+        // Validación de mes válido: 1–12
+        if (mm < 1 || mm > 12) {
+            el.setCustomValidity("Introduce un mes válido (01–12)");
+            return;
+        }
+
+        // Obtener fecha actual
+        const today = new Date();
+        const currentMM = today.getMonth() + 1; // 0–11 → 1–12
+        const currentYY = today.getFullYear() % 100; // últimos dos dígitos
+
+        // Comparar año
+        if (yy < currentYY) {
+            el.setCustomValidity("La tarjeta está expirada");
+            return;
+        }
+
+        // Si es el mismo año, comparar mes
+        if (yy === currentYY && mm < currentMM) {
+            el.setCustomValidity("La tarjeta está expirada");
+            return;
+        }
+
+        // Si pasa todo → válido
+        el.setCustomValidity("");
+    } else {
+        // Mientras no esté completo, no bloquear
+        el.setCustomValidity("");
+    }
+}
+
+        function formatCVV(el) {
+            el.value = onlyDigits(el.value).slice(0, 3); // máximo 3 dígitos
+        }
+            </script>
 </body>
 </html>

@@ -124,8 +124,31 @@ if (empty($_SESSION['csrf_contact'])) {
                     <div class="meta-item">
                         <i class="fas fa-ticket-alt"></i>
                         <div>
-                            <strong><?= (int)$evento['entradasDisponibles']; ?> disponibles</strong>
-                            <span>de <?= (int)$evento['aforoTotal']; ?> totales</span>
+                            <?php
+// Calcular entradas disponibles reales a partir de los tipos (sin duplicar por zonas)
+$sumDisponiblesHeader = 0;
+$tiposContados = [];
+
+foreach (($tiposEntrada ?? []) as $t) {
+    $idTipo = (int)($t['idTipoEntrada'] ?? 0);
+
+    // Solo sumar la primera vez que se vea ese idTipoEntrada
+    if ($idTipo && !isset($tiposContados[$idTipo])) {
+        $sumDisponiblesHeader += (int)($t['disponibles'] ?? 0);
+        $tiposContados[$idTipo] = true;
+    }
+}
+?>
+
+<div class="meta-item">
+    <i class="fas fa-ticket-alt"></i>
+    <div>
+        <strong><?= $sumDisponiblesHeader; ?> disponibles</strong>
+        <span>de <?= (int)$evento['aforoTotal']; ?> totales</span>
+    </div>
+</div>
+
+
                         </div>
                     </div>
                 </div>
@@ -362,10 +385,18 @@ if (empty($_SESSION['csrf_contact'])) {
                         <div class="card-header">
                             <h3>Selecciona tus entradas</h3>
                             <?php
-                            $sumDisponibles = 0;
-                            foreach (($tiposEntrada ?? []) as $t) {
-                                $sumDisponibles += (int)($t['disponibles'] ?? 0);
-                            }
+                           $sumDisponibles = 0;
+$tiposContados = [];
+
+foreach (($tiposEntrada ?? []) as $t) {
+    $idTipo = (int)($t['idTipoEntrada'] ?? 0);
+
+    if ($idTipo && !isset($tiposContados[$idTipo])) {
+        $sumDisponibles += (int)($t['disponibles'] ?? 0);
+        $tiposContados[$idTipo] = true;
+    }
+}
+
 
                             $aforoTotal = (int)($evento['aforoTotal'] ?? 0);
 

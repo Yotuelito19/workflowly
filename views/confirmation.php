@@ -44,98 +44,6 @@ $detalles = $compraModel->obtenerDetalles($idCompra);
     <title>Compra Confirmada - WorkFlowly</title>
     <link rel="stylesheet" href="../assets/css/confirmation.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
-        }
-        .confirmation-container {
-            background: white;
-            border-radius: 20px;
-            padding: 50px;
-            max-width: 600px;
-            text-align: center;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-        }
-        .success-icon {
-            width: 100px;
-            height: 100px;
-            background: #4CAF50;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            margin: 0 auto 30px;
-            animation: scaleIn 0.5s ease-out;
-        }
-        .success-icon i {
-            font-size: 50px;
-            color: white;
-        }
-        @keyframes scaleIn {
-            from { transform: scale(0); }
-            to { transform: scale(1); }
-        }
-        h1 {
-            color: #333;
-            margin-bottom: 10px;
-        }
-        .order-number {
-            font-size: 18px;
-            color: #666;
-            margin-bottom: 30px;
-        }
-        .order-details {
-            background: #f5f5f5;
-            border-radius: 10px;
-            padding: 20px;
-            margin: 30px 0;
-            text-align: left;
-        }
-        .detail-row {
-            display: flex;
-            justify-content: space-between;
-            padding: 10px 0;
-            border-bottom: 1px solid #ddd;
-        }
-        .detail-row:last-child {
-            border-bottom: none;
-            font-weight: bold;
-            font-size: 18px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 15px 30px;
-            margin: 10px;
-            border-radius: 10px;
-            text-decoration: none;
-            font-weight: 600;
-            transition: transform 0.2s;
-        }
-        .btn:hover {
-            transform: translateY(-2px);
-        }
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
-        }
-        .btn-secondary {
-            background: #f5f5f5;
-            color: #333;
-        }
-        .info-box {
-            background: #e3f2fd;
-            border-left: 4px solid #2196F3;
-            padding: 15px;
-            margin: 20px 0;
-            border-radius: 5px;
-            text-align: left;
-        }
-    </style>
 </head>
 <body>
     <div class="confirmation-container">
@@ -174,7 +82,7 @@ $detalles = $compraModel->obtenerDetalles($idCompra);
         </div>
 
         <div>
-            <a href="account.php" class="btn btn-primary">
+            <a href="account.php#tickets" class="btn btn-primary">
                 <i class="fas fa-ticket-alt"></i> Ver mis entradas
             </a>
             <a href="search-events.php" class="btn btn-secondary">

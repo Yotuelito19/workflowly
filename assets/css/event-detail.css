@@ -759,6 +759,9 @@ body {
     transition: all 0.3s ease;
     width: 100%;
     margin-bottom: var(--spacing-sm);
+    display: block;
+    text-align: center;
+    text-decoration: none;
 }
 
 .btn-continue:hover:not(:disabled) {
