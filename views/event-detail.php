@@ -135,27 +135,22 @@ if (empty($_SESSION['csrf_contact'])) {
                             </div>
                         </div>
                     </div>
-                    <div class="meta-item">
-                        <i class="fas fa-map-marker-alt"></i>
-                        <div>
-                            <?php
-                            
-                            if (!empty($evento['lugar_nombre'])) {
-                                $tituloLugar = $evento['lugar_nombre'];
-                                $subLugar = trim(($evento['lugar_ciudad'] ?? '') . ', ' . ($evento['lugar_pais'] ?? ''), ' ,');
-                            } else {
-                                $tituloLugar = $evento['ubicacion'];
-                                $subLugar = 'España';
-                            }
-                            ?>
-                            <strong><?= htmlspecialchars($tituloLugar); ?></strong>
-                            <?php if ($subLugar): ?>
-                                <span><?= htmlspecialchars($subLugar); ?></span>
-                            <?php endif; ?>
-                        </div>
+                    
+                    <div class="hero-actions">
+                        <button class="btn-favorite">
+                            <i class="far fa-heart"></i>
+                            Guardar evento
+                        </button>
+                        <button class="btn-share">
+                            <i class="fas fa-share-alt"></i>
+                            Compartir
+                        </button>
                     </div>
-                
-                            <?php
+                </div>
+            </div>
+        </div>
+
+        <?php
 // Calcular entradas disponibles reales a partir de los tipos (sin duplicar por zonas)
 $sumDisponiblesHeader = 0;
 $tiposContados = [];
@@ -170,33 +165,9 @@ foreach (($tiposEntrada ?? []) as $t) {
     }
 }
 ?>
-
-<div class="meta-item">
-    <i class="fas fa-ticket-alt"></i>
-    <div>
-        <strong><?= $sumDisponiblesHeader; ?> disponibles</strong>
-        <span>de <?= (int)$evento['aforoTotal']; ?> totales</span>
-    </div>
-</div>
-
-
-                        </div>
-                    </div>
-                </div>
-                <div class="hero-actions">
-                    <button class="btn-favorite">
-                        <i class="far fa-heart"></i>
-                        Guardar evento
-                    </button>
-                    <button class="btn-share">
-                        <i class="fas fa-share-alt"></i>
-                        Compartir
-                    </button>
-                </div>
-            </div>
-        </div>
     </section>
 
+    
     <!-- Main Content -->
     <section class="main-content">
         <div class="container">
