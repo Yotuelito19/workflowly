@@ -135,7 +135,6 @@ if (empty($_SESSION['csrf_contact'])) {
                             </div>
                         </div>
                     </div>
-<<<<<<< HEAD
                     <div class="meta-item">
                         <i class="fas fa-map-marker-alt"></i>
                         <div>
@@ -195,19 +194,6 @@ foreach (($tiposEntrada ?? []) as $t) {
                         <i class="fas fa-share-alt"></i>
                         Compartir
                     </button>
-=======
-                    
-                    <div class="hero-actions">
-                        <button class="btn-favorite">
-                            <i class="far fa-heart"></i>
-                            Guardar evento
-                        </button>
-                        <button class="btn-share">
-                            <i class="fas fa-share-alt"></i>
-                            Compartir
-                        </button>
-                    </div>
->>>>>>> development
                 </div>
             </div>
         </div>
@@ -432,7 +418,6 @@ foreach (($tiposEntrada ?? []) as $t) {
                         <div class="card-header">
                             <h3>Selecciona tus entradas</h3>
                             <?php
-<<<<<<< HEAD
                            $sumDisponibles = 0;
 $tiposContados = [];
 
@@ -445,12 +430,6 @@ foreach (($tiposEntrada ?? []) as $t) {
     }
 }
 
-=======
-                            $sumDisponibles = 0;
-                            foreach (($tiposEntrada ?? []) as $t) {
-                                $sumDisponibles += (int)($t['disponibles'] ?? 0);
-                            }
->>>>>>> development
 
                             $aforoTotal = (int)($evento['aforoTotal'] ?? 0);
 

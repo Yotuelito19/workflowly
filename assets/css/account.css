@@ -2138,7 +2138,6 @@ input:checked + .slider:before {
 .notification span {
     font-weight: 500;
     color: var(--text-dark);
-<<<<<<< HEAD
 }
 
 /* ========================================
@@ -3272,6 +3271,4 @@ input:checked + .slider:before {
     .payment-card-item {
         flex-wrap: wrap;
     }
-=======
->>>>>>> development
 }

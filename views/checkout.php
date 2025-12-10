@@ -479,7 +479,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
         }
         tick();
     })();
-<<<<<<< HEAD
     function onlyDigits(value) {
     return value.replace(/\D/g, '');
 }
@@ -540,8 +539,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
             el.value = onlyDigits(el.value).slice(0, 3); // máximo 3 dígitos
         }
             </script>
-=======
-    </script>
->>>>>>> development
 </body>
 </html>
