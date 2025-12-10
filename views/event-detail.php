@@ -154,9 +154,7 @@ if (empty($_SESSION['csrf_contact'])) {
                             <?php endif; ?>
                         </div>
                     </div>
-                    <div class="meta-item">
-                        <i class="fas fa-ticket-alt"></i>
-                        <div>
+                
                             <?php
 // Calcular entradas disponibles reales a partir de los tipos (sin duplicar por zonas)
 $sumDisponiblesHeader = 0;
