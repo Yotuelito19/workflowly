@@ -83,6 +83,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     }
     $active_tab = 'security';
 }
+
+
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -170,24 +172,31 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     <?php if (!empty($entradas)): ?>
         <div class="tickets-grid" id="ticketsContainer">
             <?php foreach ($entradas as $entrada): 
-                // Determinar el estado y clase CSS
-                $estado = strtolower($entrada['estado_entrada']);
-                $estadoClass = $estado;
-                $estadoIcon = '';
-                
-                switch($estado) {
-                    case 'activa':
-                        $estadoIcon = 'fa-check-circle';
-                        break;
-                    case 'usada':
-                        $estadoIcon = 'fa-history';
-                        break;
-                    case 'cancelada':
-                        $estadoIcon = 'fa-times-circle';
-                        break;
-                    default:
-                        $estadoIcon = 'fa-ticket-alt';
-                }
+    // ⚠️ IMPORTANTE: Normalizar el estado
+    $estado = strtolower(trim($entrada['estado_entrada']));
+    
+    // Mapear estados posibles a valores consistentes
+    $estadosValidos = ['activa', 'usada', 'cancelada'];
+    if (!in_array($estado, $estadosValidos)) {
+        $estado = 'activa'; // valor por defecto
+    }
+    
+    $estadoClass = $estado;
+    $estadoIcon = '';
+    
+    switch($estado) {
+        case 'activa':
+            $estadoIcon = 'fa-check-circle';
+            break;
+        case 'usada':
+            $estadoIcon = 'fa-history';
+            break;
+        case 'cancelada':
+            $estadoIcon = 'fa-times-circle';
+            break;
+        default:
+            $estadoIcon = 'fa-ticket-alt';
+    }
                 
                 // Calcular días hasta el evento
                 $fechaEvento = new DateTime($entrada['fechaInicio']);
@@ -1062,6 +1071,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     // Todo dentro de una IIFE para no ensuciar el global,
     // excepto lo que necesitamos (showTab)
     (function () {
+
+    
         // ============================================
         // GESTIÓN DE PESTAÑAS
         // ============================================
@@ -1255,6 +1266,7 @@ window.showTab = function (event, tabId) {
                 if (actions) {
                     actions.style.display = (actions.style.display === 'none') ? 'flex' : 'none';
                 }
+                
             };
 
             // ============================================
@@ -1540,44 +1552,20 @@ function compartirEvento(idEvento, nombre) {
     }
 }
 
+// Notificaciones
 function mostrarNotificacion(mensaje, tipo) {
     const notif = document.createElement('div');
-    notif.className = `notification notification-${tipo}`;
+    notif.className = `notification notification-${tipo} show`;
     notif.innerHTML = `
-        <i class="fas fa-${tipo === 'success' ? 'check-circle' : 'exclamation-circle'}"></i>
+        <i class="fas fa-${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
         <span>${mensaje}</span>
-    `;
-    notif.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: ${tipo === 'success' ? '#28a745' : '#dc3545'};
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-        z-index: 10000;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        opacity: 0;
-        transform: translateY(-20px);
-        transition: all 0.3s ease;
     `;
     
     document.body.appendChild(notif);
     
     setTimeout(() => {
-        notif.style.opacity = '1';
-        notif.style.transform = 'translateY(0)';
-    }, 100);
-    
-    setTimeout(() => {
-        notif.style.opacity = '0';
-        notif.style.transform = 'translateY(-20px)';
-        setTimeout(() => {
-            notif.remove();
-        }, 300);
+        notif.classList.remove('show');
+        setTimeout(() => notif.remove(), 300);
     }, 3000);
 }
 
@@ -1605,71 +1593,199 @@ function escapeHtml(text) {
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-// Generar códigos QR
+// ============================================
+// SISTEMA DE FILTROS DE ENTRADAS - MEJORADO
+// ============================================
+
 document.addEventListener('DOMContentLoaded', function() {
-    <?php foreach ($entradas as $entrada): ?>
-    new QRCode(document.getElementById("qr-<?php echo $entrada['idEntrada']; ?>"), {
-        text: "<?php echo htmlspecialchars($entrada['codigoQR']); ?>",
-        width: 120,
-        height: 120,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-        correctLevel: QRCode.CorrectLevel.H
-    });
-    <?php endforeach; ?>
+    inicializarFiltrosEntradas();
+    inicializarBusquedaEntradas();
+    generarCodigosQR();
 });
 
-// Filtros de entradas
-document.querySelectorAll('.filter-chip').forEach(btn => {
-    btn.addEventListener('click', function() {
-        // Activar filtro
-        document.querySelectorAll('.filter-chip').forEach(b => b.classList.remove('active'));
-        this.classList.add('active');
-        
-        const filter = this.getAttribute('data-filter');
-        const tickets = document.querySelectorAll('.ticket-card-modern');
-        
-        tickets.forEach(ticket => {
-            if (filter === 'all') {
-                ticket.style.display = 'block';
-            } else {
-                const estado = ticket.getAttribute('data-estado');
-                ticket.style.display = estado === filter ? 'block' : 'none';
-            }
+// Inicializar filtros de entradas
+function inicializarFiltrosEntradas() {
+    const filterChips = document.querySelectorAll('.filter-chip');
+    
+    if (filterChips.length === 0) {
+        console.log('No se encontraron chips de filtro');
+        return;
+    }
+    
+    filterChips.forEach(btn => {
+        btn.addEventListener('click', function() {
+            // Remover clase active de todos
+            filterChips.forEach(b => b.classList.remove('active'));
+            
+            // Activar el clickeado
+            this.classList.add('active');
+            
+            // Obtener el filtro
+            const filter = this.getAttribute('data-filter');
+            console.log('Filtro seleccionado:', filter);
+            
+            // Aplicar filtro
+            filtrarEntradas(filter);
         });
     });
-});
+    
+    console.log('✅ Filtros inicializados correctamente');
+}
 
-// Búsqueda de entradas
-document.getElementById('searchTickets').addEventListener('input', function(e) {
-    const searchTerm = e.target.value.toLowerCase();
+// Función para filtrar entradas
+function filtrarEntradas(filtro) {
     const tickets = document.querySelectorAll('.ticket-card-modern');
+    let visibles = 0;
+    let ocultos = 0;
+    
+    console.log(`🔍 Aplicando filtro: "${filtro}"`);
+    console.log(`📊 Total de tickets encontrados: ${tickets.length}`);
+    
+    tickets.forEach(ticket => {
+        const estado = ticket.getAttribute('data-estado');
+        console.log(`Ticket estado: "${estado}" | Filtro: "${filtro}"`);
+        
+        if (filtro === 'all') {
+            // Mostrar todos
+            ticket.style.display = 'block';
+            ticket.style.animation = 'fadeIn 0.3s ease-in';
+            visibles++;
+        } else {
+            // Normalizar estados para comparación
+            const estadoNormalizado = estado ? estado.toLowerCase().trim() : '';
+            const filtroNormalizado = filtro.toLowerCase().trim();
+            
+            if (estadoNormalizado === filtroNormalizado) {
+                ticket.style.display = 'block';
+                ticket.style.animation = 'fadeIn 0.3s ease-in';
+                visibles++;
+            } else {
+                ticket.style.display = 'none';
+                ocultos++;
+            }
+        }
+    });
+    
+    console.log(`✅ Filtrado completo: ${visibles} visibles, ${ocultos} ocultos`);
+    
+    // Mostrar mensaje si no hay resultados
+    mostrarMensajeNoResultados(visibles, filtro);
+}
+
+// Mostrar mensaje cuando no hay resultados
+function mostrarMensajeNoResultados(cantidad, filtro) {
+    const container = document.getElementById('ticketsContainer');
+    if (!container) return;
+    
+    // Remover mensaje anterior si existe
+    const mensajeAnterior = document.querySelector('.no-results-message');
+    if (mensajeAnterior) {
+        mensajeAnterior.remove();
+    }
+    
+    // Si no hay tickets visibles, mostrar mensaje
+    if (cantidad === 0) {
+        const mensaje = document.createElement('div');
+        mensaje.className = 'no-results-message';
+        mensaje.innerHTML = `
+            <div class="empty-state-inline">
+                <i class="fas fa-search"></i>
+                <h4>No se encontraron entradas</h4>
+                <p>No tienes entradas con estado "${filtro}"</p>
+            </div>
+        `;
+        container.appendChild(mensaje);
+    }
+}
+
+// Inicializar búsqueda de entradas
+function inicializarBusquedaEntradas() {
+    const searchInput = document.getElementById('searchTickets');
+    
+    if (!searchInput) {
+        console.log('Campo de búsqueda no encontrado');
+        return;
+    }
+    
+    searchInput.addEventListener('input', function(e) {
+        const searchTerm = e.target.value.toLowerCase().trim();
+        console.log('🔍 Buscando:', searchTerm);
+        
+        buscarEntradas(searchTerm);
+    });
+    
+    console.log('✅ Búsqueda inicializada');
+}
+
+// Función de búsqueda
+function buscarEntradas(termino) {
+    const tickets = document.querySelectorAll('.ticket-card-modern');
+    let encontrados = 0;
     
     tickets.forEach(ticket => {
         const eventoName = ticket.getAttribute('data-evento');
-        ticket.style.display = eventoName.includes(searchTerm) ? 'block' : 'none';
+        
+        if (!termino || eventoName.includes(termino)) {
+            // Verificar si el ticket está oculto por filtro
+            if (ticket.style.display !== 'none' || !termino) {
+                ticket.style.display = 'block';
+                ticket.style.opacity = '1';
+                encontrados++;
+            }
+        } else {
+            ticket.style.opacity = '0.3';
+        }
     });
-});
+    
+    console.log(`📊 Búsqueda: ${encontrados} tickets coinciden`);
+}
+
+// Generar códigos QR
+function generarCodigosQR() {
+    const qrContainers = document.querySelectorAll('[id^="qr-"]');
+    
+    qrContainers.forEach(container => {
+        const idEntrada = container.id.replace('qr-', '');
+        const codigoQR = container.closest('.ticket-card-modern')?.querySelector('.qr-code-text')?.textContent;
+        
+        if (codigoQR && typeof QRCode !== 'undefined') {
+            try {
+                new QRCode(container, {
+                    text: codigoQR,
+                    width: 120,
+                    height: 120,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (error) {
+                console.error('Error generando QR:', error);
+            }
+        }
+    });
+}
+
+// ============================================
+// FUNCIONES AUXILIARES
+// ============================================
 
 // Descargar entrada
 function descargarEntrada(idEntrada) {
-    // Aquí implementarías la descarga real del PDF
-    mostrarNotificacion('Descargando entrada...', 'info');
+    mostrarNotificacion('Preparando descarga...', 'info');
     
-    // Simulación de descarga
+    // Aquí implementarías la descarga real
     setTimeout(() => {
-        mostrarNotificacion('Entrada descargada correctamente', 'success');
-        
-        // En producción, harías algo como:
         // window.location.href = '../api/descargar-entrada.php?id=' + idEntrada;
+        mostrarNotificacion('Entrada descargada correctamente', 'success');
     }, 1000);
 }
 
 // Ver detalles de entrada
 function verDetallesEntrada(idEntrada) {
-    // Aquí cargarías los detalles completos vía AJAX
     const modal = document.getElementById('ticketDetailModal');
     const content = document.getElementById('ticketDetailContent');
+    
+    if (!modal || !content) return;
     
     content.innerHTML = `
         <div class="loading-spinner">
@@ -1680,55 +1796,96 @@ function verDetallesEntrada(idEntrada) {
     
     modal.style.display = 'flex';
     
-    // Simular carga de datos
+    // Simular carga de datos (reemplazar con fetch real)
     setTimeout(() => {
-        content.innerHTML = `
-            <h2>Detalles de la entrada</h2>
-            <p>Contenido de ejemplo para la entrada #${idEntrada}</p>
-            <button class="btn-primary" onclick="cerrarModalEntrada()">Cerrar</button>
-        `;
+        fetch(`../api/entrada-detalles.php?id=${idEntrada}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.ok) {
+                    mostrarDetallesEntrada(data.entrada);
+                } else {
+                    content.innerHTML = `
+                        <div class="error-message">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Error al cargar los detalles</p>
+                        </div>
+                    `;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                content.innerHTML = `
+                    <div class="error-message">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <p>Error de conexión</p>
+                    </div>
+                `;
+            });
     }, 500);
 }
 
+// Mostrar detalles en modal
+function mostrarDetallesEntrada(entrada) {
+    const content = document.getElementById('ticketDetailContent');
+    
+    content.innerHTML = `
+        <div class="ticket-detail-header">
+            <h2>${entrada.evento_nombre}</h2>
+            <span class="status-badge status-${entrada.estado.toLowerCase()}">${entrada.estado}</span>
+        </div>
+        <div class="ticket-detail-body">
+            <div class="detail-section">
+                <h4>Información del evento</h4>
+                <p><strong>Fecha:</strong> ${entrada.fecha}</p>
+                <p><strong>Ubicación:</strong> ${entrada.ubicacion}</p>
+                <p><strong>Zona:</strong> ${entrada.zona || 'General'}</p>
+            </div>
+            <div class="detail-section">
+                <h4>Información de la entrada</h4>
+                <p><strong>ID:</strong> #${entrada.idEntrada}</p>
+                <p><strong>Tipo:</strong> ${entrada.tipo}</p>
+                <p><strong>Precio:</strong> ${entrada.precio}€</p>
+            </div>
+        </div>
+        <div class="ticket-detail-footer">
+            <button class="btn-primary" onclick="cerrarModalEntrada()">Cerrar</button>
+            <button class="btn-secondary" onclick="descargarEntrada(${entrada.idEntrada})">
+                <i class="fas fa-download"></i> Descargar
+            </button>
+        </div>
+    `;
+}
+
+// Cerrar modal
 function cerrarModalEntrada() {
-    document.getElementById('ticketDetailModal').style.display = 'none';
+    const modal = document.getElementById('ticketDetailModal');
+    if (modal) {
+        modal.style.display = 'none';
+    }
 }
 
 // Compartir entrada
 function compartirEntrada(idEntrada, nombreEvento) {
-    const url = window.location.origin + '/workflowly/views/event-detail.php?ticket=' + idEntrada;
+    const url = `${window.location.origin}/workflowly/views/event-detail.php?ticket=${idEntrada}`;
     
     if (navigator.share) {
         navigator.share({
-            title: 'Mi entrada: ' + nombreEvento,
+            title: `Mi entrada: ${nombreEvento}`,
             text: '¡Mira mi entrada para este evento!',
             url: url
         }).catch(err => console.log('Error al compartir:', err));
     } else {
-        navigator.clipboard.writeText(url).then(() => {
-            mostrarNotificacion('Enlace copiado al portapapeles', 'success');
-        }).catch(() => {
-            prompt('Copia este enlace:', url);
-        });
+        // Fallback: copiar al portapapeles
+        navigator.clipboard.writeText(url)
+            .then(() => {
+                mostrarNotificacion('Enlace copiado al portapapeles', 'success');
+            })
+            .catch(() => {
+                prompt('Copia este enlace:', url);
+            });
     }
 }
 
-// Notificaciones
-function mostrarNotificacion(mensaje, tipo) {
-    const notif = document.createElement('div');
-    notif.className = `notification notification-${tipo} show`;
-    notif.innerHTML = `
-        <i class="fas fa-${tipo === 'success' ? 'check-circle' : tipo === 'error' ? 'exclamation-circle' : 'info-circle'}"></i>
-        <span>${mensaje}</span>
-    `;
-    
-    document.body.appendChild(notif);
-    
-    setTimeout(() => {
-        notif.classList.remove('show');
-        setTimeout(() => notif.remove(), 300);
-    }, 3000);
-}
 
 
 </script>
