@@ -633,7 +633,7 @@ foreach (($tiposEntrada ?? []) as $t) {
 // Verificar favoritos al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     <?php if (is_logged_in()): ?>
-    document.querySelectorAll('.favorite-btn').forEach(btn => {
+    document.querySelectorAll('.btn-favorite').forEach(btn => {
         const eventoId = btn.dataset.eventoId;
         verificarFavorito(eventoId, btn);
     });
