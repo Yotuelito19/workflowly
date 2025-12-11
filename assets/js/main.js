@@ -172,7 +172,48 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     });
+    
+    // Inicializar carrusel del hero
+    initHeroCarousel();
 });
+
+/**
+ * Carrusel del Hero - transición lateral cada 10 segundos
+ */
+function initHeroCarousel() {
+    const slides = document.querySelectorAll('.carousel-slide');
+    
+    if (slides.length === 0) return;
+    
+    let currentSlide = 0;
+    const AUTOPLAY_DELAY = 10000; // 10 segundos
+    
+    function nextSlide() {
+        const current = slides[currentSlide];
+        const nextIndex = (currentSlide + 1) % slides.length;
+        const next = slides[nextIndex];
+        
+        // Slide actual sale hacia la izquierda
+        current.classList.remove('active');
+        current.classList.add('exit');
+        
+        // Siguiente slide entra desde la derecha
+        next.classList.add('active');
+        
+        // Después de la transición, resetear el slide anterior sin animación
+        setTimeout(() => {
+            current.style.transition = 'none';
+            current.classList.remove('exit');
+            // Forzar reflow para aplicar el cambio inmediatamente
+            current.offsetHeight;
+            current.style.transition = '';
+        }, 1000);
+        
+        currentSlide = nextIndex;
+    }
+    
+    setInterval(nextSlide, AUTOPLAY_DELAY);
+}
 
 // Prevenir envío múltiple de formularios
 function preventMultipleSubmit(form) {

@@ -65,6 +65,17 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
 
     <!-- Hero Section -->
     <section class="hero">
+        <!-- Carrusel de fondo -->
+        <div class="hero-carousel">
+            <div class="carousel-slide active" style="background-image: url('assets/images/carousel-1.jpg');"></div>
+            <div class="carousel-slide" style="background-image: url('assets/images/carousel-2.jpg');"></div>
+            <div class="carousel-slide" style="background-image: url('assets/images/carousel-3.jpg');"></div>
+            <div class="carousel-slide" style="background-image: url('assets/images/carousel-4.jpg');"></div>
+            <div class="carousel-slide" style="background-image: url('assets/images/carousel-5.jpg');"></div>
+        </div>
+        <!-- Overlay oscuro -->
+        <div class="hero-overlay"></div>
+        
         <div class="hero-content">
             <h1>Encuentra eventos increíbles<br><span class="highlight">sin precios inflados</span></h1>
             <p class="hero-subtitle">La plataforma de ticketing que combate la reventa abusiva y garantiza precios justos para todos.</p>
