@@ -172,7 +172,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     <?php if (!empty($entradas)): ?>
         <div class="tickets-grid" id="ticketsContainer">
             <?php foreach ($entradas as $entrada): 
-    // ⚠️ IMPORTANTE: Normalizar el estado
+    //  IMPORTANTE: Normalizar el estado
     $estado = strtolower(trim($entrada['estado_entrada']));
     
     // Mapear estados posibles a valores consistentes
@@ -609,13 +609,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
 
             <!-- Mi Perfil -->
             <div class="tab-content <?php echo $active_tab === 'profile' ? 'active' : ''; ?>" id="profile">
-                <?php if (!empty($mensaje_perfil)): ?>
-                <div class="alert alert-success" id="alertPerfil">
-                    <i class="fas fa-check-circle"></i>
-                    <?php echo $mensaje_perfil; ?>
-                </div>
-                <?php endif; ?>
-
                 <div class="content-grid">
                     <!-- Tarjeta de perfil -->
                     <div class="profile-card">
@@ -769,12 +762,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
                             </button>
                         </div>
 
-                        <!-- Mensaje global -->
-                        <?php if (!empty($mensaje_password) && $mensaje_tipo === 'success'): ?>
-                            <div class="alert alert-success" id="successMessage">
-                                <i class="fas fa-check-circle"></i> <?php echo $mensaje_password; ?>
-                            </div>
-                        <?php endif; ?>
 
                         <!-- Formulario oculto -->
                         <section id="formPassword" class="mt-3" style="display:<?php echo (!empty($mensaje_password) && $mensaje_tipo === 'error') ? 'block' : 'none'; ?>;">
@@ -1071,7 +1058,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     // Todo dentro de una IIFE para no ensuciar el global,
     // excepto lo que necesitamos (showTab)
     (function () {
+        // ============================================
+        // 🎯 NOTIFICACIONES PHP AL CARGAR
+        // ============================================
+        <?php if (!empty($mensaje_perfil)): ?>
+            document.addEventListener('DOMContentLoaded', function() {
+                mostrarNotificacion('<?php echo addslashes($mensaje_perfil); ?>', 'success');
+            });
+        <?php endif; ?>
 
+        <?php if (!empty($mensaje_password)): ?>
+            document.addEventListener('DOMContentLoaded', function() {
+                mostrarNotificacion('<?php echo addslashes($mensaje_password); ?>', '<?php echo $mensaje_tipo === 'error' ? 'error' : 'success'; ?>');
+            });
+        <?php endif; ?>
     
         // ============================================
         // GESTIÓN DE PESTAÑAS
@@ -1780,13 +1780,57 @@ function descargarEntrada(idEntrada) {
     }, 1000);
 }
 
-// Ver detalles de entrada
+// Almacenar datos de entradas para acceso rápido
+const entradasData = new Map();
+
+// Inicializar datos de entradas al cargar la página
+function inicializarDatosEntradas() {
+    document.querySelectorAll('.ticket-card-modern').forEach(card => {
+        const idEntrada = card.querySelector('[onclick*="verDetallesEntrada"]')
+            ?.getAttribute('onclick')
+            ?.match(/\d+/)?.[0];
+        
+        if (!idEntrada) return;
+        
+        // Extraer datos de la tarjeta
+        const datos = {
+            idEntrada: idEntrada,
+            nombre: card.querySelector('.ticket-event-info h3')?.textContent || '',
+            estado: card.querySelector('.ticket-status')?.textContent?.trim() || '',
+            estadoClass: card.getAttribute('data-estado') || '',
+            tipo: card.querySelector('.ticket-type')?.textContent || '',
+            fecha: card.querySelector('.ticket-meta-row span:first-child')?.textContent?.replace(/.*\n\s*/, '') || '',
+            hora: card.querySelector('.ticket-meta-row span:last-child')?.textContent?.replace(/.*\n\s*/, '') || '',
+            ubicacion: card.querySelector('.detail-item:nth-child(1) span')?.textContent || '',
+            zona: card.querySelector('.detail-item:nth-child(2) span')?.textContent || 'General',
+            asiento: card.querySelector('.detail-item:nth-child(3) span')?.textContent || 'No asignado',
+            codigoQR: card.querySelector('.qr-code-text')?.textContent || '',
+            imagenEvento: card.querySelector('.ticket-header-gradient')?.style.backgroundImage || ''
+        };
+        
+        entradasData.set(idEntrada, datos);
+    });
+    
+    console.log(`✅ ${entradasData.size} entradas cargadas en memoria`);
+}
+
+// Llamar al cargar el DOM
+document.addEventListener('DOMContentLoaded', function() {
+    inicializarDatosEntradas();
+});
+
+// Función mejorada para ver detalles de entrada
 function verDetallesEntrada(idEntrada) {
     const modal = document.getElementById('ticketDetailModal');
     const content = document.getElementById('ticketDetailContent');
     
-    if (!modal || !content) return;
+    if (!modal || !content) {
+        console.error('Modal no encontrado');
+        return;
+    }
     
+    // Mostrar modal con loader
+    modal.style.display = 'flex';
     content.innerHTML = `
         <div class="loading-spinner">
             <i class="fas fa-spinner fa-spin"></i>
@@ -1794,76 +1838,261 @@ function verDetallesEntrada(idEntrada) {
         </div>
     `;
     
-    modal.style.display = 'flex';
+    // Buscar datos en memoria primero
+    const datosMemoria = entradasData.get(idEntrada.toString());
     
-    // Simular carga de datos (reemplazar con fetch real)
-    setTimeout(() => {
+    if (datosMemoria) {
+        // Mostrar desde memoria (instantáneo)
+        setTimeout(() => {
+            mostrarDetallesEntradaMejorado(datosMemoria);
+        }, 300);
+    } else {
+        // Fallback: intentar obtener del servidor
         fetch(`../api/entrada-detalles.php?id=${idEntrada}`)
             .then(response => response.json())
             .then(data => {
-                if (data.ok) {
-                    mostrarDetallesEntrada(data.entrada);
+                if (data.ok && data.entrada) {
+                    mostrarDetallesEntradaMejorado(data.entrada);
                 } else {
-                    content.innerHTML = `
-                        <div class="error-message">
-                            <i class="fas fa-exclamation-circle"></i>
-                            <p>Error al cargar los detalles</p>
-                        </div>
-                    `;
+                    mostrarErrorDetalles('No se pudieron cargar los detalles');
                 }
             })
             .catch(error => {
                 console.error('Error:', error);
-                content.innerHTML = `
-                    <div class="error-message">
-                        <i class="fas fa-exclamation-circle"></i>
-                        <p>Error de conexión</p>
-                    </div>
-                `;
+                mostrarErrorDetalles('Error de conexión');
             });
-    }, 500);
+    }
 }
 
-// Mostrar detalles en modal
-function mostrarDetallesEntrada(entrada) {
+// Mostrar detalles mejorados en modal
+function mostrarDetallesEntradaMejorado(entrada) {
     const content = document.getElementById('ticketDetailContent');
     
+    // Determinar icono según estado
+    let estadoIcon = 'fa-check-circle';
+    let estadoClass = entrada.estadoClass || entrada.estado?.toLowerCase() || 'activa';
+    
+    switch(estadoClass) {
+        case 'usada':
+            estadoIcon = 'fa-history';
+            break;
+        case 'cancelada':
+            estadoIcon = 'fa-times-circle';
+            break;
+        default:
+            estadoIcon = 'fa-check-circle';
+    }
+    
     content.innerHTML = `
-        <div class="ticket-detail-header">
-            <h2>${entrada.evento_nombre}</h2>
-            <span class="status-badge status-${entrada.estado.toLowerCase()}">${entrada.estado}</span>
-        </div>
-        <div class="ticket-detail-body">
-            <div class="detail-section">
-                <h4>Información del evento</h4>
-                <p><strong>Fecha:</strong> ${entrada.fecha}</p>
-                <p><strong>Ubicación:</strong> ${entrada.ubicacion}</p>
-                <p><strong>Zona:</strong> ${entrada.zona || 'General'}</p>
+        <div class="ticket-detail-container">
+            <!-- Header del modal -->
+            <div class="ticket-detail-header-full">
+                <div class="detail-event-info">
+                    <div class="detail-event-icon">
+                        <i class="fas fa-ticket-alt"></i>
+                    </div>
+                    <div>
+                        <h2>${entrada.nombre}</h2>
+                        <p class="detail-subtitle">Resumen completo de tu entrada</p>
+                    </div>
+                </div>
+                <span class="status-badge-large status-${estadoClass}">
+                    <i class="fas ${estadoIcon}"></i>
+                    ${entrada.estado}
+                </span>
             </div>
-            <div class="detail-section">
-                <h4>Información de la entrada</h4>
-                <p><strong>ID:</strong> #${entrada.idEntrada}</p>
-                <p><strong>Tipo:</strong> ${entrada.tipo}</p>
-                <p><strong>Precio:</strong> ${entrada.precio}€</p>
+            
+            <!-- Información principal -->
+            <div class="ticket-detail-grid">
+                <!-- Sección: Información del evento -->
+                <div class="detail-section-modern">
+                    <div class="section-header-detail">
+                        <i class="fas fa-calendar-alt"></i>
+                        <h3>Información del Evento</h3>
+                    </div>
+                    <div class="detail-items">
+                        <div class="detail-item-row">
+                            <span class="detail-label">
+                                <i class="fas fa-calendar-day"></i>
+                                Fecha
+                            </span>
+                            <span class="detail-value">${entrada.fecha}</span>
+                        </div>
+                        <div class="detail-item-row">
+                            <span class="detail-label">
+                                <i class="fas fa-clock"></i>
+                                Hora
+                            </span>
+                            <span class="detail-value">${entrada.hora}</span>
+                        </div>
+                        <div class="detail-item-row">
+                            <span class="detail-label">
+                                <i class="fas fa-map-marker-alt"></i>
+                                Ubicación
+                            </span>
+                            <span class="detail-value">${entrada.ubicacion}</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Sección: Información de la entrada -->
+                <div class="detail-section-modern">
+                    <div class="section-header-detail">
+                        <i class="fas fa-ticket-alt"></i>
+                        <h3>Detalles de la Entrada</h3>
+                    </div>
+                    <div class="detail-items">
+                        <div class="detail-item-row">
+                            <span class="detail-label">
+                                <i class="fas fa-hashtag"></i>
+                                ID de Entrada
+                            </span>
+                            <span class="detail-value">#${entrada.idEntrada}</span>
+                        </div>
+                        <div class="detail-item-row">
+                            <span class="detail-label">
+                                <i class="fas fa-tag"></i>
+                                Tipo
+                            </span>
+                            <span class="detail-value">${entrada.tipo}</span>
+                        </div>
+                        <div class="detail-item-row">
+                            <span class="detail-label">
+                                <i class="fas fa-layer-group"></i>
+                                Zona
+                            </span>
+                            <span class="detail-value">${entrada.zona}</span>
+                        </div>
+                        ${entrada.asiento !== 'No asignado' ? `
+                        <div class="detail-item-row">
+                            <span class="detail-label">
+                                <i class="fas fa-chair"></i>
+                                Asiento
+                            </span>
+                            <span class="detail-value">${entrada.asiento}</span>
+                        </div>
+                        ` : ''}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Código QR ampliado -->
+            <div class="detail-qr-section">
+                <div class="qr-header">
+                    <i class="fas fa-qrcode"></i>
+                    <h3>Código de Acceso</h3>
+                </div>
+                <div class="qr-display">
+                    <div class="qr-code-large" id="modal-qr-${entrada.idEntrada}"></div>
+                    <div class="qr-info-detail">
+                        <p class="qr-code-text-large">${entrada.codigoQR}</p>
+                        <div class="qr-instructions">
+                            <i class="fas fa-info-circle"></i>
+                            <span>Presenta este código QR en la entrada del evento para acceder</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Información importante -->
+            <div class="detail-important-info">
+                <div class="info-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <strong>Importante</strong>
+                        <p>No compartas este código QR. Es personal e intransferible.</p>
+                    </div>
+                </div>
+                <div class="info-box tip">
+                    <i class="fas fa-lightbulb"></i>
+                    <div>
+                        <strong>Consejo</strong>
+                        <p>Descarga el PDF para tener tu entrada disponible sin conexión.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Acciones del modal -->
+            <div class="ticket-detail-actions">
+                <button class="btn-secondary-modal" onclick="cerrarModalEntrada()">
+                    <i class="fas fa-times"></i>
+                    Cerrar
+                </button>
+                <button class="btn-primary-modal" onclick="descargarEntrada(${entrada.idEntrada})">
+                    <i class="fas fa-download"></i>
+                    Descargar PDF
+                </button>
+                <button class="btn-share-modal" onclick="compartirEntrada(${entrada.idEntrada}, '${entrada.nombre.replace(/'/g, "\\'")}')">
+                    <i class="fas fa-share-alt"></i>
+                    Compartir
+                </button>
             </div>
         </div>
-        <div class="ticket-detail-footer">
-            <button class="btn-primary" onclick="cerrarModalEntrada()">Cerrar</button>
-            <button class="btn-secondary" onclick="descargarEntrada(${entrada.idEntrada})">
-                <i class="fas fa-download"></i> Descargar
+    `;
+    
+    // Generar código QR en el modal
+    setTimeout(() => {
+        const qrContainer = document.getElementById(`modal-qr-${entrada.idEntrada}`);
+        if (qrContainer && entrada.codigoQR && typeof QRCode !== 'undefined') {
+            try {
+                new QRCode(qrContainer, {
+                    text: entrada.codigoQR,
+                    width: 180,
+                    height: 180,
+                    colorDark: "#000000",
+                    colorLight: "#ffffff",
+                    correctLevel: QRCode.CorrectLevel.H
+                });
+            } catch (error) {
+                console.error('Error generando QR en modal:', error);
+            }
+        }
+    }, 100);
+}
+
+// Mostrar error en modal
+function mostrarErrorDetalles(mensaje) {
+    const content = document.getElementById('ticketDetailContent');
+    content.innerHTML = `
+        <div class="error-state-modal">
+            <div class="error-icon">
+                <i class="fas fa-exclamation-circle"></i>
+            </div>
+            <h3>Error al cargar detalles</h3>
+            <p>${mensaje}</p>
+            <button class="btn-primary" onclick="cerrarModalEntrada()">
+                Cerrar
             </button>
         </div>
     `;
 }
 
-// Cerrar modal
+// Cerrar modal con animación
 function cerrarModalEntrada() {
     const modal = document.getElementById('ticketDetailModal');
     if (modal) {
-        modal.style.display = 'none';
+        modal.style.opacity = '0';
+        setTimeout(() => {
+            modal.style.display = 'none';
+            modal.style.opacity = '1';
+        }, 300);
     }
 }
 
+// Cerrar modal al hacer clic fuera
+document.addEventListener('click', function(e) {
+    const modal = document.getElementById('ticketDetailModal');
+    if (e.target === modal) {
+        cerrarModalEntrada();
+    }
+});
+
+// Cerrar modal con tecla ESC
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        cerrarModalEntrada();
+    }
+});
 // Compartir entrada
 function compartirEntrada(idEntrada, nombreEvento) {
     const url = `${window.location.origin}/workflowly/views/event-detail.php?ticket=${idEntrada}`;

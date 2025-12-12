@@ -144,7 +144,8 @@ if (empty($_SESSION['csrf_contact'])) {
                         <i class="far fa-heart"></i>
                         Guardar evento
                     </button>
-                        <button class="btn-share">
+                        <button class="btn-share" 
+                            onclick="compartirEvento(<?php echo (int)$evento['idEvento']; ?>, '<?php echo htmlspecialchars($evento['nombre'], ENT_QUOTES); ?>')">
                             <i class="fas fa-share-alt"></i>
                             Compartir
                         </button>
@@ -391,16 +392,16 @@ foreach (($tiposEntrada ?? []) as $t) {
                             <h3>Selecciona tus entradas</h3>
                             <?php
                            $sumDisponibles = 0;
-$tiposContados = [];
+                            $tiposContados = [];
 
-foreach (($tiposEntrada ?? []) as $t) {
-    $idTipo = (int)($t['idTipoEntrada'] ?? 0);
+                                foreach (($tiposEntrada ?? []) as $t) {
+                                $idTipo = (int)($t['idTipoEntrada'] ?? 0);
 
-    if ($idTipo && !isset($tiposContados[$idTipo])) {
-        $sumDisponibles += (int)($t['disponibles'] ?? 0);
-        $tiposContados[$idTipo] = true;
-    }
-}
+                        if ($idTipo && !isset($tiposContados[$idTipo])) {
+                            $sumDisponibles += (int)($t['disponibles'] ?? 0);
+                            $tiposContados[$idTipo] = true;
+                        }
+                        }   
 
 
                             $aforoTotal = (int)($evento['aforoTotal'] ?? 0);
@@ -849,6 +850,35 @@ function toggleFavorito(eventoId, btn) {
     }
   });
 })();
+
+// Compartir evento
+function compartirEvento(idEvento, nombreEvento) {
+    // Construir URL del evento
+    const url = `${window.location.origin}/workflowly/views/event-detail.php?id=${idEvento}`;
+    
+    // Verificar si el navegador soporta Web Share API
+    if (navigator.share) {
+        navigator.share({
+            title: nombreEvento,
+            text: `¡No te pierdas este evento increíble! ${nombreEvento}`,
+            url: url
+        })
+        .then(() => {
+            console.log('Evento compartido exitosamente');
+        })
+        .catch((error) => {
+            // Si el usuario cancela, no mostramos error
+            if (error.name !== 'AbortError') {
+                console.error('Error al compartir:', error);
+                // Fallback si falla Web Share
+                copiarAlPortapapeles(url);
+            }
+        });
+    } else {
+        // Fallback: copiar al portapapeles
+        copiarAlPortapapeles(url);
+    }
+}
     </script>
    
 
