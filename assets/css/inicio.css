@@ -308,11 +308,12 @@ body {
     overflow: hidden;
     box-shadow: var(--shadow-medium);
     width: 200px;
-    transition: transform 0.3s ease;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
     display: block;
     text-decoration: none;
     color: inherit;
     cursor: pointer;
+    border: 3px solid var(--primary-color);
 }
 
 .event-card:link,
@@ -334,6 +335,7 @@ body {
 .event-card:hover {
     transform: translateY(-8px) scale(1.05);
     box-shadow: 0 12px 24px rgba(0,0,0,0.2);
+    border-color: var(--primary-dark);
 }
 
 .event-card:nth-child(2):hover {
