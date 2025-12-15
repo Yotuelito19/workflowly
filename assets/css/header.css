@@ -1,6 +1,5 @@
 /* ========================================
-   HEADER CSS - WorkFlowly
-   Estilos compartidos para el header
+   HEADER CSS
    ======================================== */
 
 /* Variables CSS necesarias para el header */
@@ -76,7 +75,7 @@
     color: var(--text-dark);
 }
 
-/* Menú de navegación */
+/* Menu de navegacion */
 .nav-menu {
     display: flex;
     gap: var(--spacing-lg);

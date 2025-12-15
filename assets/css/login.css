@@ -876,17 +876,17 @@ body {
     box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
 }
 
-/* colorear el icono de la izquierda cuando el select tiene focus */
+/* colorear el icono de la izquierda */
 .input-wrapper:has(select:focus) i {
     color: var(--primary-color);
 }
 
-/* estado hover (opcional) */
+/* estado hover */
 .input-wrapper select:hover {
     border-color: var(--gray-400);
 }
 
-/* placeholder/option deshabilitada (si la usas) */
+/* placeholder/option deshabilitada */
 .input-wrapper select:invalid {
     color: var(--gray-500);
 }
@@ -903,7 +903,7 @@ body {
     box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
 }
 
-/* Ajuste responsive como tus inputs en móvil */
+/* Ajuste responsive como tus inputs en movil */
 @media (max-width: 480px) {
     .input-wrapper select {
         padding: 12px 44px 12px 44px;

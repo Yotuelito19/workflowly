@@ -2,7 +2,7 @@
  * JavaScript principal de WorkFlowly
  */
 
-// Toggle del menú móvil
+// Toggle del menu movil
 function toggleMobileMenu() {
     const navMenu = document.querySelector('.nav-menu');
     const toggle = document.querySelector('.mobile-menu-toggle');
@@ -10,7 +10,7 @@ function toggleMobileMenu() {
     toggle.classList.toggle('active');
 }
 
-// Validación de formularios
+// Validacion de formularios
 function validateForm(formId) {
     const form = document.getElementById(formId);
     if (!form) return false;
@@ -30,13 +30,13 @@ function validateForm(formId) {
     return isValid;
 }
 
-// Validar email
+// Validarr email
 function validateEmail(email) {
     const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     return re.test(email);
 }
 
-// Mostrar/ocultar contraseña
+// Mostrar/ocultar contrasena
 function togglePassword(inputId) {
     const input = document.getElementById(inputId);
     if (input.type === 'password') {
@@ -66,7 +66,7 @@ function showNotification(message, type = 'info') {
     }, 3000);
 }
 
-// Confirmar acción
+// Confirmar accion
 function confirmAction(message) {
     return confirm(message);
 }
@@ -149,7 +149,7 @@ const Cart = {
     }
 };
 
-// Inicializar al cargar la página
+// Inicializar al cargar la pagina
 document.addEventListener('DOMContentLoaded', function() {
     // Actualizar contador del carrito
     Cart.updateCartCount();
@@ -177,9 +177,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initHeroCarousel();
 });
 
-/**
- * Carrusel del Hero - transición lateral cada 10 segundos
- */
+
 function initHeroCarousel() {
     const slides = document.querySelectorAll('.carousel-slide');
     
@@ -215,7 +213,7 @@ function initHeroCarousel() {
     setInterval(nextSlide, AUTOPLAY_DELAY);
 }
 
-// Prevenir envío múltiple de formularios
+// Prevenir envío multiple de formularios
 function preventMultipleSubmit(form) {
     const submitBtn = form.querySelector('button[type="submit"]');
     if (submitBtn) {
@@ -242,7 +240,7 @@ function initDeselectableRadioButtons() {
             }
         });
 
-        // Guardar el radio que está inicialmente seleccionado
+        // Guardar el radio que esta inicialmente seleccionado
         if (radio.checked) {
             lastChecked = radio;
         }
@@ -264,7 +262,7 @@ function resetPriceFilter() {
     }
 }
 
-// Inicializar radio buttons deseleccionables cuando el DOM esté listo
+// Inicializar radio buttons deseleccionables cuando el DOM este listo
 document.addEventListener('DOMContentLoaded', function() {
     initDeselectableRadioButtons();
 });
@@ -304,10 +302,6 @@ async function cargarOrganizadores() {
 // FUNCIONES PARA SEARCH-EVENTS.PHP
 // ============================================
 
-/**
- * Cambiar el orden de los eventos
- * Preserva todos los parámetros de búsqueda actuales
- */
 function changeSort(sortValue) {
     const url = new URL(window.location.href);
     url.searchParams.set('orden', sortValue);
@@ -341,7 +335,6 @@ function resetPriceFilter() {
 
   // Mapa de columnas -> clave dentro del JSON de cada fila
   // Índices basados en tu <thead>:
-  // 0: ID, 1: Nombre, 2: Inicio, 3: Fin, 4: Estado, 5: Stock, 6: Acciones (no ordena)
   const columnKeyMap = {
     0: 'idEvento',
     1: 'nombre',
@@ -354,7 +347,7 @@ function resetPriceFilter() {
   // Marca como "sortable" todos los TH salvo el último (Acciones)
   const ths = Array.from(thead.querySelectorAll('th'));
   ths.forEach((th, idx) => {
-    if (idx === ths.length - 1) return; // Acciones: no ordenable
+    if (idx === ths.length - 1) return;
     th.classList.add('sortable');
     const indicator = document.createElement('span');
     indicator.className = 'sort-indicator';
@@ -364,7 +357,7 @@ function resetPriceFilter() {
       const key = columnKeyMap[idx];
       if (!key) return;
 
-      // Alternar dirección
+      // Alternar direccion
       const isAsc = !th.classList.contains('is-asc');
       ths.forEach(h => h.classList.remove('is-asc', 'is-desc'));
       th.classList.add(isAsc ? 'is-asc' : 'is-desc');
@@ -372,7 +365,7 @@ function resetPriceFilter() {
       // Tomar filas actuales
       const rows = Array.from(tbody.querySelectorAll('tr'));
 
-      // Función para extraer valor desde data-json (si falla, usa el texto de la celda)
+      // Función para extraer valor desde data-json
       const getValue = (tr) => {
         try {
           const obj = JSON.parse(tr.getAttribute('data-json') || '{}');
@@ -385,7 +378,6 @@ function resetPriceFilter() {
 
       // Comparadores por tipo de campo
       const parseMaybeDate = (v) => {
-        // Soporta 'YYYY-MM-DD HH:MM:SS' y variantes parseables por Date
         const d = new Date(v);
         return isNaN(d.getTime()) ? null : d.getTime();
       };
@@ -406,7 +398,7 @@ function resetPriceFilter() {
           if (va === null) va = -Infinity;
           if (vb === null) vb = -Infinity;
         } else {
-          // Texto (Nombre, Estado)
+          // Texto
           va = (va ?? '').toString().toLowerCase();
           vb = (vb ?? '').toString().toLowerCase();
         }

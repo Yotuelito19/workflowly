@@ -1,9 +1,7 @@
 /* =========================================
-   WorkFlowly - Admin (Eventos) — CSS optimizado
-   Meta: mantener la misma apariencia reduciendo duplicados
+   Admin (Eventos)
    ========================================= */
 
-/* ===== Variables & Reset ===== */
 :root {
   --primary-color: #4CAF50;
   --primary-dark: #388E3C;
@@ -310,7 +308,7 @@ body {
   background: rgba(255,193,7,.25);
 }
 
-/* Botón eliminar unificado */
+/* Boton eliminar unificado */
 .btn-del,
 .actions .btn-del,
 .actions .danger,
@@ -518,5 +516,5 @@ th.sortable .sort-indicator {
 th.sortable.is-asc .sort-indicator::after { content: "▲"; }
 th.sortable.is-desc .sort-indicator::after { content: "▼"; }
 
-/* Un poco de feedback al pasar el ratón */
+/* Al pasar el cursor */
 th.sortable:hover { filter: brightness(1.08); }

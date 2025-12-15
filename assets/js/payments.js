@@ -2,10 +2,9 @@
    JAVASCRIPT PARA SECCIÓN DE PAGOS
    ======================================== */
 
-// Variables globales
 let metodoPagoActual = null;
 
-// Inicializar cuando el DOM esté listo
+// Inicializar cuando el DOM este listo
 document.addEventListener('DOMContentLoaded', function() {
     inicializarSeccionPagos();
 });
@@ -25,7 +24,7 @@ function inicializarSeccionPagos() {
 function cargarMetodosPago() {
     const container = document.getElementById('paymentCardsContainer');
     
-    // Simular carga de métodos de pago (en producción vendría de la API)
+    // Simular carga de metodos de pago
     setTimeout(() => {
         const metodosPago = [
             {
@@ -131,7 +130,7 @@ function establecerPredeterminado(idMetodo) {
     // Simular actualización (en producción sería una llamada AJAX)
     mostrarNotificacion('Método de pago establecido como predeterminado', 'success');
     
-    // Recargar métodos
+    // Recargar metodos
     setTimeout(() => {
         cargarMetodosPago();
     }, 500);
@@ -155,7 +154,7 @@ function eliminarMetodoPago(idMetodo) {
             card.remove();
             mostrarNotificacion('Método de pago eliminado', 'success');
             
-            // Si no quedan más tarjetas, mostrar estado vacío
+            // Si no quedan mas tarjetas, mostrar estado vacio
             const container = document.getElementById('paymentCardsContainer');
             if (!container.querySelector('.payment-card-item')) {
                 mostrarMetodosPago([]);
@@ -186,7 +185,7 @@ function configurarFormularioTarjeta() {
     const form = document.getElementById('formAgregarTarjeta');
     if (!form) return;
     
-    // Formateo automático del número de tarjeta
+    // Formateo automatico del número de tarjeta
     const cardNumber = document.getElementById('cardNumber');
     if (cardNumber) {
         cardNumber.addEventListener('input', function(e) {
@@ -196,7 +195,7 @@ function configurarFormularioTarjeta() {
         });
     }
     
-    // Formateo de fecha de expiración
+    // Formateo de fecha de expiracion
     const cardExpiry = document.getElementById('cardExpiry');
     if (cardExpiry) {
         cardExpiry.addEventListener('input', function(e) {
@@ -230,7 +229,7 @@ function guardarMetodoPago() {
     const cardCVV = document.getElementById('cardCVV').value;
     const setAsDefault = document.getElementById('setAsDefault').checked;
     
-    // Validaciones básicas
+    // Validaciones basicas
     if (!validarNumeroTarjeta(cardNumber.replace(/\s/g, ''))) {
         mostrarNotificacion('Número de tarjeta inválido', 'error');
         return;
@@ -246,7 +245,7 @@ function guardarMetodoPago() {
         return;
     }
     
-    // Simular guardado (en producción sería una llamada AJAX segura)
+    // Simular guardado
     mostrarNotificacion('Procesando...', 'info');
     
     setTimeout(() => {
@@ -257,7 +256,7 @@ function guardarMetodoPago() {
 }
 
 function validarNumeroTarjeta(numero) {
-    // Algoritmo de Luhn para validación básica
+    // Algoritmo de Luhn para validación bsica
     if (!/^\d{13,19}$/.test(numero)) return false;
     
     let sum = 0;
@@ -414,12 +413,9 @@ function cerrarModalDetalles() {
 function descargarFactura(idCompra) {
     mostrarNotificacion('Descargando factura...', 'info');
     
-    // Simular descarga (en producción sería una llamada al backend)
+    // Simular descarga (en produccion seria una llamada al backend)
     setTimeout(() => {
         mostrarNotificacion('Factura descargada correctamente', 'success');
-        
-        // En producción:
-        // window.location.href = '../api/descargar-factura.php?id=' + idCompra;
     }, 1000);
 }
 
@@ -447,7 +443,7 @@ document.addEventListener('keydown', function(e) {
 });
 
 // ============================================
-// FUNCIÓN DE NOTIFICACIÓN (si no existe)
+// FUNCIÓN DE NOTIFICACIÓN
 // ============================================
 if (typeof mostrarNotificacion !== 'function') {
     function mostrarNotificacion(mensaje, tipo) {

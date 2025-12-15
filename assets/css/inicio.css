@@ -264,7 +264,7 @@ body {
     transform: translateY(-2px);
 }
 
-/* Estadísticas */
+/* Estadisticas */
 .hero-stats {
     display: flex;
     gap: var(--spacing-xl);
@@ -469,7 +469,7 @@ body {
     color: var(--primary-color);
 }
 
-/* CaracterÃ­sticas */
+/* Caracteri­sticas */
 .features {
     padding: var(--spacing-xxl) 0;
     background: var(--background-light);

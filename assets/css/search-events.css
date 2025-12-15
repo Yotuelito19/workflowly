@@ -221,7 +221,7 @@ body {
     align-items: start;
 }
 
-/* Filters Sidebar */
+/* Filters */
 .filters-sidebar {
     background: var(--white);
     border-radius: var(--border-radius);
@@ -266,7 +266,7 @@ body {
     color: var(--text-dark);
 }
 
-/* Header del filtro con botón de reset */
+/* Header del filtro con boton de reset */
 .filter-group-header {
     display: flex;
     justify-content: space-between;
@@ -278,7 +278,7 @@ body {
     margin-bottom: 0;
 }
 
-/* Botón de reset precio */
+/* Boton de reset precio */
 .reset-price-btn {
     background: none;
     border: none;
@@ -358,7 +358,7 @@ body {
     color: var(--text-light);
 }
 
-/* Custom Radio */
+/* Customm Radio */
 .filter-radio {
     display: flex;
     align-items: center;
@@ -818,7 +818,7 @@ body {
         gap: var(--spacing-xs);
     }
 }
-/* Botón favorito activo */
+/* Boton favorito activo */
 .favorite-btn {
     transition: all 0.3s ease;
 }

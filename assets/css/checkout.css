@@ -612,7 +612,7 @@ body {
 }
 
 .event-image {
-    width: 150px;            /* antes 64–80px */
+    width: 150px;
     height: 150px;
     border-radius: 18px;
     background: linear-gradient(45deg, var(--primary-color), var(--secondary-color));
@@ -672,7 +672,7 @@ body {
 
 .ticket-type {
     font-weight: 600;
-    font-size: 1.3rem;          /* más grande */
+    font-size: 1.3rem;
     color: var(--text-dark);
 }
 
@@ -690,12 +690,12 @@ body {
     gap: 4px;
 }
 .ticket-amount {
-    font-size: 1.3rem;          /* precio grande */
+    font-size: 1.3rem;
     color: var(--text-dark);
 }
 
 .ticket-quantity {
-    font-size: 1rem;       /* cantidad más pequeña */
+    font-size: 1rem;
     color: var(--text-dark);
 }
 
