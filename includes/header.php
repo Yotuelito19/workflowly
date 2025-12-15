@@ -1,8 +1,3 @@
-<?php
-/**
- * Header compartido de la aplicación
- */
-?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/header.css">
 <header class="header">
     <div class="container">

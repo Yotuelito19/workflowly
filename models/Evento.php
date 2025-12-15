@@ -191,7 +191,7 @@ class Evento {
 
         $stmt = $this->conn->prepare($query);
 
-        // saneamos lo básico
+        // Limpiar datos de entrada
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->descripcion = htmlspecialchars(strip_tags($this->descripcion));
         $this->tipo = htmlspecialchars(strip_tags($this->tipo));
@@ -209,7 +209,7 @@ class Evento {
         $stmt->bindParam(':imagenPrincipal', $this->imagenPrincipal);
         $stmt->bindParam(':idEstadoEvento', $this->idEstadoEvento, PDO::PARAM_INT);
 
-        // 👇 nuevos, pueden ser null
+        // Campos opcionales (pueden ser null)
         $stmt->bindValue(':idLugar', $this->idLugar ?: null, PDO::PARAM_INT);
         $stmt->bindValue(':idOrganizador', $this->idOrganizador ?: null, PDO::PARAM_INT);
 
@@ -244,7 +244,7 @@ class Evento {
     }
 
     /**
-     * Actualizar evento (versión tuya adaptada)
+     * Actualizar evento
      */
     public function actualizar($data) {
         $query = "UPDATE " . $this->table_name . " 
@@ -274,7 +274,7 @@ class Evento {
         $stmt->bindParam(':imagenPrincipal', $data['imagenPrincipal']);
         $stmt->bindParam(':idEstadoEvento', $data['idEstadoEvento'], PDO::PARAM_INT);
 
-        // 👇 nuevos
+        // Campos opcionales (pueden ser null)
         $idLugar = !empty($data['idLugar']) ? $data['idLugar'] : null;
         $idOrganizador = !empty($data['idOrganizador']) ? $data['idOrganizador'] : null;
         $stmt->bindValue(':idLugar', $idLugar, PDO::PARAM_INT);
@@ -293,7 +293,9 @@ class Evento {
         return $stmt->execute();
     }
 
-    /** Listado para admin (aquí es donde lo usa tu gestor) */
+    /**
+     * Listar todos los eventos para el panel de administración
+     */
     public function listarTodos($limit = 50, $offset = 0) {
         $query = "SELECT 
                     e.*,
@@ -316,8 +318,7 @@ class Evento {
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function obtenerDetalleCompleto(int $idEvento)
-{
+    public function obtenerDetalleCompleto(int $idEvento) {
     $sql = "SELECT 
                 e.*,
                 -- Lugar (puede ser null)

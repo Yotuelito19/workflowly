@@ -131,7 +131,6 @@ class Compra {
 
     /**
      * Obtener compras de un usuario
-     * Cambios realizados
      */
     public function obtenerComprasUsuario($idUsuario) {
     $query = "SELECT c.*, 
@@ -157,7 +156,6 @@ class Compra {
 
     /**
      * Obtener detalles de una compra
-     * Cambios realizados
      */
     public function obtenerDetalles($idCompra) {
     $query = "SELECT dc.*, 
@@ -185,7 +183,6 @@ class Compra {
 
     /**
      * Obtener entradas de un usuario
-     * Cambios realizados
      */
     public function obtenerEntradasUsuario($idUsuario) {
     $query = "SELECT e.*, 

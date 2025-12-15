@@ -34,7 +34,7 @@ class Usuario {
 
         $stmt = $this->conn->prepare($query);
 
-        // Sanitizar inputs
+        // Limpiar datos de entrada
         $this->nombre = htmlspecialchars(strip_tags($this->nombre));
         $this->apellidos = htmlspecialchars(strip_tags($this->apellidos));
         $this->email = htmlspecialchars(strip_tags($this->email));
@@ -45,7 +45,7 @@ class Usuario {
         // Hash de contraseña
         $password_hash = password_hash($this->password, PASSWORD_HASH_ALGO, ['cost' => PASSWORD_HASH_COST]);
 
-        // Bind valores
+        // Asignar valores a la consulta
         $stmt->bindParam(":nombre", $this->nombre);
         $stmt->bindParam(":apellidos", $this->apellidos);
         $stmt->bindParam(":email", $this->email);

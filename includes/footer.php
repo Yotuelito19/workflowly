@@ -1,8 +1,3 @@
-<?php
-/**
- * Footer compartido de la aplicación
- */
-?>
 <link rel="stylesheet" href="<?php echo BASE_URL; ?>/assets/css/footer.css">
 <footer class="footer">
     <div class="container">
