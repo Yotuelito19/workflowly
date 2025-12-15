@@ -304,6 +304,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <?php endif; ?>
 });
 
+// Comprobar si un evento está en favoritos
 function verificarFavorito(eventoId, btn) {
     fetch(`../api/favoritos.php?accion=verificar&idEvento=${eventoId}`)
         .then(response => response.json())
@@ -316,6 +317,7 @@ function verificarFavorito(eventoId, btn) {
         });
 }
 
+// Añadir o quitar un evento de favoritos
 function toggleFavorito(eventoId, btn) {
     <?php if (!is_logged_in()): ?>
         window.location.href = 'login.php?redirect=search-events.php';
@@ -360,12 +362,14 @@ function toggleFavorito(eventoId, btn) {
     });
 }
 
+// Cambiar el orden de los resultados
 function changeSort(value) {
     const url = new URL(window.location);
     url.searchParams.set('orden', value);
     window.location = url;
 }
 
+// Limpiar filtro de precio
 function resetPriceFilter() {
     document.getElementById('precio_min').value = '';
     document.getElementById('precio_max').value = '';
