@@ -10,6 +10,7 @@ require_once '../config/database.php';
 if (is_logged_in()) {
     redirect('/index.php');
 }
+
 // Detectar si viene desde el botón de registro
 $showRegister = isset($_GET['register']) && $_GET['register'] == '1';
 
@@ -80,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 $usuario->apellidos = $apellidos;
                 $usuario->email = $email;
                 $usuario->telefono = $telefono;
-                $usuario->password = $password;// CORREGIDO: era contraseña
+                $usuario->password = $password;
                 $usuario->fechaNacimiento = $fechaNacimiento; 
                 $usuario->tipoUsuario = $tipoUsuario;
                 $usuario->idEstadoUsuario = $idEstadoActivo;
@@ -180,7 +181,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <!-- Right Side - Auth Forms -->
                 <div class="auth-forms">
                     <!-- Login Form -->
-                     <div class="form-container" id="loginForm" <?php echo ($register_success || $showRegister) ? 'style="display:none;"' : ''; ?>>
+                    <div class="form-container" id="loginForm" <?php echo ($register_success || $showRegister) ? 'style="display:none;"' : ''; ?>>
                         <div class="form-header">
                             <h2>Bienvenido de vuelta</h2>
                             <p>Inicia sesión para acceder a tu cuenta</p>
@@ -252,7 +253,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     </div>
 
                     <!-- Register Form -->
-                     <div class="form-container <?php echo (!$register_success && !$showRegister) ? 'hidden' : ''; ?>" id="registerForm">
+                    <div class="form-container <?php echo (!$register_success && !$showRegister) ? 'hidden' : ''; ?>" id="registerForm">
                         <div class="form-header">
                             <h2>Crear cuenta nueva</h2>
                             <p>Regístrate y empieza a disfrutar eventos sin reventa</p>
@@ -327,8 +328,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                             </div>
 
-                             
-
                             <div class="form-group">
                                 <label for="confirmPassword">Confirmar contraseña</label>
                                 <div class="input-wrapper">
@@ -339,6 +338,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </button>
                                 </div>
                             </div>
+
                             <div class="form-group">
                                 <label for="birthDate">Fecha de nacimiento</label>
                                 <div class="input-wrapper">
@@ -347,6 +347,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                 </div>
                                 <small>Necesario para verificar edad en eventos</small>
                             </div>
+
                             <div class="form-group">
                                 <label for="userType">Tipo de usuario</label>
                                 <div class="input-wrapper">
@@ -357,6 +358,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     </select>
                                 </div>
                             </div>
+
                             <div class="form-options">
                                 <label class="checkbox-label required">
                                     <input type="checkbox" name="terms" required>
@@ -374,10 +376,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                                     Quiero recibir ofertas y novedades por email
                                 </label>
                             </div>
+
                             <button type="submit" class="btn-primary">
                                 Crear cuenta
                                 <i class="fas fa-arrow-right"></i>
                             </button>
+
                             <div class="divider">
                                 <span>O regístrate con</span>
                             </div>
@@ -404,7 +408,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         </div>
     </main>
 
-   <!-- Footer -->
+    <!-- Footer -->
     <footer class="footer">
         <div class="container">
             <div class="footer-content">
@@ -419,8 +423,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             </div>
         </div>
     </footer>
+
     <script>
-        // Toggle password visibility
+        // Mostrar/ocultar contraseña
         function togglePassword(inputId) {
             const input = document.getElementById(inputId);
             const button = input.parentElement.querySelector('.toggle-password');
@@ -436,7 +441,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 icon.classList.add('fa-eye');
             }
         }
-         // Password strength checker
+
+        // Verificador de seguridad de contraseña
         const passwordInput = document.getElementById('registerPassword');
         const strengthBar = document.querySelector('.strength-fill');
         const strengthText = document.querySelector('.strength-text');
@@ -480,14 +486,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             });
         }
 
-        // Show register form
+        // Mostrar formulario de registro
         function showRegisterForm() {
             document.getElementById('loginForm').style.display = 'none';
             document.getElementById('registerForm').classList.remove('hidden');
             document.getElementById('registerForm').style.display = 'block';
         }
 
-        // Show login form
+        // Mostrar formulario de login
         function showLoginForm() {
             document.getElementById('registerForm').style.display = 'none';
             document.getElementById('loginForm').classList.remove('hidden');
