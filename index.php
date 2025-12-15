@@ -7,33 +7,29 @@
 require_once 'config/config.php';
 require_once 'config/database.php';
 
-// Función helper para obtener la URL correcta de la imagen
+// Funcion helper para obtener la URL correcta de la imagen
 function getImageUrl($imagePath) {
     // Si la imagen es default.jpg o no existe, usar placeholder
     if (empty($imagePath) || $imagePath === 'default.jpg' || $imagePath === 'imagen/default.jpg') {
         return BASE_URL . '/api/admin/events/uploads/0b10db93db401e3d.jpg';
     }
     
-    // Limpiar la ruta: quitar 'uploads/' si existe para evitar duplicación
     $cleanPath = str_replace('uploads/', '', $imagePath);
     
-    // Verificar si la imagen existe en /uploads/ (carpeta principal)
     $mainUploadPath = UPLOADS_PATH . '/' . $cleanPath;
     if (file_exists($mainUploadPath)) {
         return UPLOADS_URL . '/' . $cleanPath;
     }
     
-    // Verificar si existe en /api/admin/events/uploads/
     $adminUploadPath = BASE_PATH . '/api/admin/events/uploads/' . $cleanPath;
     if (file_exists($adminUploadPath)) {
         return BASE_URL . '/api/admin/events/uploads/' . $cleanPath;
     }
     
-    // Si no existe en ningún lado, retornar placeholder
     return BASE_URL . '/api/admin/events/uploads/0b10db93db401e3d.jpg';
 }
 
-// Verificar timeout de sesión
+// Verificar timeout de sesion
 if (is_logged_in()) {
     if (isset($_SESSION['last_activity']) && (time() - $_SESSION['last_activity'] > SESSION_TIMEOUT)) {
         session_unset();
@@ -107,7 +103,7 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
                 </form>
             </div>
 
-            <!-- Estadísticas -->
+            <!-- Estadíissticas -->
             <div class="hero-stats">
                 <div class="stat">
                     <span class="stat-number">50K+</span>
@@ -175,7 +171,7 @@ $eventos = $eventoModel->obtenerEventosDisponibles(8, 0);
         </div>
     </section>
 
-    <!-- Características -->
+    <!-- Caracteristicas -->
     <section class="features" id="como-funciona">
         <div class="container">
             <div class="section-header">
