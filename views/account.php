@@ -112,8 +112,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
                     <i class="fas fa-ticket-alt"></i> Mis Entradas
                 </a>
                 <a href="#favoritos" class="tab-btn <?php echo $active_tab === 'favoritos' ? 'active' : ''; ?>" onclick="showTab(event, 'favoritos')">
-        <i class="fas fa-heart"></i> Favoritos
-    </a>
+                    <i class="fas fa-heart"></i> Favoritos
+                </a>
                 <a href="#payments" class="tab-btn <?php echo $active_tab === 'payments' ? 'active' : ''; ?>" onclick="showTab(event, 'payments')">
                     <i class="fas fa-credit-card"></i> Pagos
                 </a>
@@ -172,33 +172,32 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     <?php if (!empty($entradas)): ?>
         <div class="tickets-grid" id="ticketsContainer">
             <?php foreach ($entradas as $entrada): 
-    //  IMPORTANTE: Normalizar el estado
     $estado = strtolower(trim($entrada['estado_entrada']));
     
     // Mapear estados posibles a valores consistentes
     $estadosValidos = ['activa', 'usada', 'cancelada'];
     if (!in_array($estado, $estadosValidos)) {
-        $estado = 'activa'; // valor por defecto
+        $estado = 'activa'; 
     }
     
     $estadoClass = $estado;
     $estadoIcon = '';
     
-    switch($estado) {
-        case 'activa':
-            $estadoIcon = 'fa-check-circle';
+        switch($estado) {
+            case 'activa':
+                $estadoIcon = 'fa-check-circle';
             break;
-        case 'usada':
-            $estadoIcon = 'fa-history';
+            case 'usada':
+                $estadoIcon = 'fa-history';
             break;
-        case 'cancelada':
-            $estadoIcon = 'fa-times-circle';
+            case 'cancelada':
+                $estadoIcon = 'fa-times-circle';
             break;
-        default:
-            $estadoIcon = 'fa-ticket-alt';
-    }
+            default:
+                $estadoIcon = 'fa-ticket-alt';
+        }
                 
-                // Calcular días hasta el evento
+            // Calcular días hasta el evento
                 $fechaEvento = new DateTime($entrada['fechaInicio']);
                 $hoy = new DateTime();
                 $diasRestantes = $hoy->diff($fechaEvento)->days;
@@ -306,8 +305,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
                     </button>
                 </div>
             </div>
-            
+
             <?php endforeach; ?>
+
         </div>
     <?php else: ?>
         <div class="empty-state">
@@ -352,7 +352,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
 
             </div>
 
-           <!-- Tab Pagos - Versión Mejorada -->
+           <!-- Tab Pagos  -->
 <div class="tab-content <?php echo $active_tab === 'payments' ? 'active' : ''; ?>" id="payments">
     
     <!-- Header de la sección -->
@@ -602,7 +602,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
             <i class="fas fa-times"></i>
         </button>
         <div id="detallesCompraContent">
-            <!-- El contenido se cargará dinámicamente -->
         </div>
     </div>
 </div>
@@ -1055,12 +1054,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
     <?php include __DIR__ . '/../includes/footer.php'; ?>
 
         <script>
-    // Todo dentro de una IIFE para no ensuciar el global,
-    // excepto lo que necesitamos (showTab)
+    // Todo dentro de una IIFE para no ensuciar el global
     (function () {
-        // ============================================
-        // 🎯 NOTIFICACIONES PHP AL CARGAR
-        // ============================================
+        
+        // Notificaniones PHP al cargar
         <?php if (!empty($mensaje_perfil)): ?>
             document.addEventListener('DOMContentLoaded', function() {
                 mostrarNotificacion('<?php echo addslashes($mensaje_perfil); ?>', 'success');
@@ -1073,9 +1070,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
             });
         <?php endif; ?>
     
-        // ============================================
-        // GESTIÓN DE PESTAÑAS
-        // ============================================
+        
+        // Gestión de pestañas
         function activarTab(tabId) {
             // Ocultar todas las pestañas
             document.querySelectorAll('.tab-content').forEach(function (tab) {
@@ -1108,7 +1104,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['cambiar_password'])) 
         }
  
 
-        /// Esta función la usa el HTML en onclick="showTab(event, 'profile')"
+        
 window.showTab = function (event, tabId) {
     if (event && event.preventDefault) {
         event.preventDefault();
@@ -1116,25 +1112,24 @@ window.showTab = function (event, tabId) {
 
     activarTab(tabId);
 
-    // Si el usuario abre la pestaña Favoritos, cargamos (solo una vez)
+    // Si el usuario abre la pestaña Favoritos, cargamos
     if (tabId === 'favoritos' && !favoritosCargados) {
-        console.log('🎯 Cargando favoritos desde showTab...');
+        console.log('Cargando favoritos desde showTab...');
         cargarFavoritos();
         favoritosCargados = true;
     }
 };
 
 
-        // Activar pestaña según el hash al cargar (por si venimos de #tickets, etc.)
+        // Activar pestaña según el hash al cargar
        document.addEventListener('DOMContentLoaded', function () {
     var hash = window.location.hash ? window.location.hash.substring(1) : '';
 
-    // Si la URL viene con #algo, activar esa pestaña
     if (hash) {
         activarTab(hash);
 
         if (hash === 'favoritos' && !favoritosCargados) {
-            console.log('🎯 Cargando favoritos desde DOMContentLoaded...');
+            console.log('Cargando favoritos desde DOMContentLoaded...');
             cargarFavoritos();
             favoritosCargados = true;
         }
@@ -1143,10 +1138,7 @@ window.showTab = function (event, tabId) {
         activarTab('profile');
     }
 
-
-            // ============================================
-            // MOSTRAR / OCULTAR FORMULARIO DE CAMBIO DE CONTRASEÑA
-            // ============================================
+            // Mostrar / ocultar formulario de cambio de contraseña
             var btnMostrarPassword = document.getElementById('btnMostrarPassword');
             var btnCerrarPassword  = document.getElementById('btnCerrarPassword');
             var formPassword       = document.getElementById('formPassword');
@@ -1184,9 +1176,8 @@ window.showTab = function (event, tabId) {
                 });
             }
 
-            // ============================================
-            // MOSTRAR / OCULTAR CONTRASEÑAS
-            // ============================================
+            
+            // Mostrar / ocultar contraseñas
             document.querySelectorAll('.toggle-password').forEach(function (btn) {
                 btn.addEventListener('click', function () {
                     var targetId = btn.getAttribute('data-target');
@@ -1203,9 +1194,7 @@ window.showTab = function (event, tabId) {
                 });
             });
 
-            // ============================================
-            // MEDIDOR DE FUERZA DE CONTRASEÑA
-            // ============================================
+            // Medidor de fuerza de contraseña
             var passwordInput = document.getElementById('password_nueva');
             var strengthBar   = document.getElementById('strength-bar');
             var strengthText  = document.getElementById('strength-text');
@@ -1249,9 +1238,7 @@ window.showTab = function (event, tabId) {
                 });
             }
 
-            // ============================================
-            // EDICIÓN DE PERFIL
-            // ============================================
+            // Edición de perfil
             window.toggleEditMode = function () {
                 var displays = document.querySelectorAll('.detail-display');
                 var edits    = document.querySelectorAll('.detail-edit');
@@ -1269,9 +1256,7 @@ window.showTab = function (event, tabId) {
                 
             };
 
-            // ============================================
-            // DESVANECER MENSAJES DE ALERTA
-            // ============================================
+            // Desvanecer mensajes de alerta
             var alertPerfil   = document.getElementById('alertPerfil');
             var alertPassword = document.getElementById('alertPassword');
 
@@ -1294,14 +1279,13 @@ window.showTab = function (event, tabId) {
             }
         });
     })();
- // ============================================
-// GESTIÓN DE FAVORITOS
-// ============================================
+ 
+// Gestión de favoritos
 let favoritosCargados = false;
 
 function cargarFavoritos() {
     const container = document.getElementById('favoritosContainer');
-    console.log('🔍 Iniciando carga de favoritos...');
+    console.log('Iniciando carga de favoritos...');
     
     container.innerHTML = `
         <div class="spinner">
@@ -1312,21 +1296,21 @@ function cargarFavoritos() {
     
     fetch('../api/favoritos.php?accion=listar')
         .then(response => {
-            console.log('📥 Respuesta recibida:', response.status);
+            console.log('Respuesta recibida:', response.status);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
             return response.json();
         })
         .then(data => {
-            console.log('✅ Datos parseados:', data);
+            console.log(' Datos parseados:', data);
             
             if (data.ok && data.favoritos && data.favoritos.length > 0) {
-                console.log(`📊 Total favoritos: ${data.favoritos.length}`);
+                console.log(` Total favoritos: ${data.favoritos.length}`);
                 document.getElementById('totalFavoritos').textContent = data.favoritos.length;
                 mostrarFavoritos(data.favoritos);
             } else {
-                console.log('ℹ️ No hay favoritos');
+                console.log(' No hay favoritos');
                 document.getElementById('totalFavoritos').textContent = '0';
                 container.innerHTML = `
                     <div class="empty-state">
@@ -1341,7 +1325,7 @@ function cargarFavoritos() {
             }
         })
         .catch(error => {
-            console.error('❌ Error:', error);
+            console.error('Error:', error);
             container.innerHTML = `
                 <div class="error-state">
                     <i class="fas fa-exclamation-circle"></i>
@@ -1380,7 +1364,7 @@ function mostrarFavoritos(favoritos) {
         const fechaEv = new Date(evento.fechaInicio);
         const diasHasta = Math.ceil((fechaEv - hoy) / (1000 * 60 * 60 * 24));
         
-        // 🔴 MANEJO CORRECTO DE IMÁGENES
+        // Manejo correcto de imágenes
         const imagenDefault = '<?php echo BASE_URL; ?>/api/admin/events/uploads/0b10db93db401e3d.jpg';
         let imagenUrl = imagenDefault;
         
@@ -1593,9 +1577,8 @@ function escapeHtml(text) {
     </script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <script>
-// ============================================
-// SISTEMA DE FILTROS DE ENTRADAS - MEJORADO
-// ============================================
+
+// Sistema de filtros de entradas
 
 document.addEventListener('DOMContentLoaded', function() {
     inicializarFiltrosEntradas();
@@ -1629,7 +1612,7 @@ function inicializarFiltrosEntradas() {
         });
     });
     
-    console.log('✅ Filtros inicializados correctamente');
+    console.log('Filtros inicializados correctamente');
 }
 
 // Función para filtrar entradas
@@ -1638,8 +1621,8 @@ function filtrarEntradas(filtro) {
     let visibles = 0;
     let ocultos = 0;
     
-    console.log(`🔍 Aplicando filtro: "${filtro}"`);
-    console.log(`📊 Total de tickets encontrados: ${tickets.length}`);
+    console.log(`Aplicando filtro: "${filtro}"`);
+    console.log(`Total de tickets encontrados: ${tickets.length}`);
     
     tickets.forEach(ticket => {
         const estado = ticket.getAttribute('data-estado');
@@ -1666,7 +1649,7 @@ function filtrarEntradas(filtro) {
         }
     });
     
-    console.log(`✅ Filtrado completo: ${visibles} visibles, ${ocultos} ocultos`);
+    console.log(`Filtrado completo: ${visibles} visibles, ${ocultos} ocultos`);
     
     // Mostrar mensaje si no hay resultados
     mostrarMensajeNoResultados(visibles, filtro);
@@ -1709,12 +1692,12 @@ function inicializarBusquedaEntradas() {
     
     searchInput.addEventListener('input', function(e) {
         const searchTerm = e.target.value.toLowerCase().trim();
-        console.log('🔍 Buscando:', searchTerm);
+        console.log(' Buscando:', searchTerm);
         
         buscarEntradas(searchTerm);
     });
     
-    console.log('✅ Búsqueda inicializada');
+    console.log('Búsqueda inicializada');
 }
 
 // Función de búsqueda
@@ -1737,7 +1720,7 @@ function buscarEntradas(termino) {
         }
     });
     
-    console.log(`📊 Búsqueda: ${encontrados} tickets coinciden`);
+    console.log(`Búsqueda: ${encontrados} tickets coinciden`);
 }
 
 // Generar códigos QR
@@ -1764,10 +1747,6 @@ function generarCodigosQR() {
         }
     });
 }
-
-// ============================================
-// FUNCIONES AUXILIARES
-// ============================================
 
 // Descargar entrada
 function descargarEntrada(idEntrada) {
@@ -1811,7 +1790,7 @@ function inicializarDatosEntradas() {
         entradasData.set(idEntrada, datos);
     });
     
-    console.log(`✅ ${entradasData.size} entradas cargadas en memoria`);
+    console.log(`${entradasData.size} entradas cargadas en memoria`);
 }
 
 // Llamar al cargar el DOM

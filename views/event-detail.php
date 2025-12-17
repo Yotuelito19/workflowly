@@ -155,19 +155,19 @@ if (empty($_SESSION['csrf_contact'])) {
         </div>
 
         <?php
-// Calcular entradas disponibles reales a partir de los tipos (sin duplicar por zonas)
-$sumDisponiblesHeader = 0;
-$tiposContados = [];
+    // Calcular entradas disponibles reales a partir de los tipos (sin duplicar por zonas)
+    $sumDisponiblesHeader = 0;
+    $tiposContados = [];
 
-foreach (($tiposEntrada ?? []) as $t) {
-    $idTipo = (int)($t['idTipoEntrada'] ?? 0);
+    foreach (($tiposEntrada ?? []) as $t) {
+        $idTipo = (int)($t['idTipoEntrada'] ?? 0);
 
-    // Solo sumar la primera vez que se vea ese idTipoEntrada
-    if ($idTipo && !isset($tiposContados[$idTipo])) {
-        $sumDisponiblesHeader += (int)($t['disponibles'] ?? 0);
-        $tiposContados[$idTipo] = true;
+        // Solo sumar la primera vez que se vea ese idTipoEntrada
+        if ($idTipo && !isset($tiposContados[$idTipo])) {
+            $sumDisponiblesHeader += (int)($t['disponibles'] ?? 0);
+            $tiposContados[$idTipo] = true;
+        }
     }
-}
 ?>
     </section>
 
@@ -185,7 +185,7 @@ foreach (($tiposEntrada ?? []) as $t) {
                         </div>
                     </div>
 
-                    <!-- LOCALIZACIÓN -->
+                    <!-- Localización -->
                     <div class="venue-card">
                         <h2>Localización</h2>
                         <div class="venue-info">
@@ -261,7 +261,7 @@ foreach (($tiposEntrada ?? []) as $t) {
                         </div>
                     </div>
 
-                    <!-- ORGANIZADOR -->
+                    <!-- Organizador -->
                     <div class="organizer-card">
                         <h2>Información del organizador</h2>
                         <div class="organizer-info">
@@ -309,7 +309,7 @@ foreach (($tiposEntrada ?? []) as $t) {
                         </div>
                     </div>
 
-                    <!-- POLÍTICAS -->
+                    <!-- Políticas -->
                     <div class="policies-card">
                         <h2>Políticas del evento</h2>
                         <div class="policies-content">
@@ -418,7 +418,7 @@ foreach (($tiposEntrada ?? []) as $t) {
                                 $percentText = (string)round($percentLeftFloat) . '%';
                             }
 
-                            // UMBRALES por % 
+                            // Umbrales por % 
                             if ($sumDisponibles === 0) {
                                 $stockClass = 'soldout';
                                 $stockText  = 'Entradas agotadas';
@@ -631,6 +631,7 @@ foreach (($tiposEntrada ?? []) as $t) {
     <?php include __DIR__ . '/../includes/footer.php'; ?>
 
      <script>
+
 // Verificar favoritos al cargar la página
 document.addEventListener('DOMContentLoaded', () => {
     <?php if (is_logged_in()): ?>
@@ -726,13 +727,13 @@ function toggleFavorito(eventoId, btn) {
     const current = parseInt(input.value || '0', 10);
     if (current < max) {
         input.value = current + 1;
-        syncQtyLabel(id);        // 🔴 actualizar el <span>
+        syncQtyLabel(id);        
         updateTotal();
     }
 }
         function syncQtyLabel(id){
     const input = document.getElementById('qty_' + id);
-    const label = document.getElementById('qty_label_' + id); // span del HTML
+    const label = document.getElementById('qty_label_' + id); 
     if (input && label) {
         const val = Math.max(0, parseInt(input.value || '0', 10));
         label.textContent = String(val);
@@ -744,7 +745,7 @@ function toggleFavorito(eventoId, btn) {
     const current = parseInt(input.value || '0', 10);
     if (current > 0) {
         input.value = current - 1;
-        syncQtyLabel(id);        // 🔴 actualizar el <span>
+        syncQtyLabel(id);        
         updateTotal();
     }
 }
@@ -768,7 +769,7 @@ function toggleFavorito(eventoId, btn) {
     modal.classList.remove('is-open'); 
   }
 
-  // --- Cerrar al hacer click fuera sin romper la selección de texto ---
+  // Cerrar al hacer click fuera sin romper la selección de texto
   let coMouseDownOnOverlay = false;
 
   modal.addEventListener('mousedown', (e) => {
@@ -879,9 +880,6 @@ function compartirEvento(idEvento, nombreEvento) {
         copiarAlPortapapeles(url);
     }
 }
-    </script>
-   
-
-
+</script>
 </body>
 </html>

@@ -283,7 +283,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
                                 <input type="email" name="email" required value="<?php echo htmlspecialchars($_SESSION['user_email']); ?>">
                             </div>
                         </div>
-<br>
+                        <br>
                         <div class="form-section">
                             <h2>Método de pago</h2>
                             <div class="payment-methods">
@@ -484,13 +484,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
 }
 
         function formatCardNumber(el) {
-            let value = onlyDigits(el.value).slice(0, 16); // máximo 16 dígitos
+            let value = onlyDigits(el.value).slice(0, 16);
             let groups = value.match(/.{1,4}/g);
             el.value = groups ? groups.join(' ') : '';
         }
 
         function formatExpiry(el) {
-    let value = onlyDigits(el.value).slice(0, 4); // MMYY
+    let value = onlyDigits(el.value).slice(0, 4); 
 
     // Formateo visual (MM/YY)
     if (value.length >= 3) {
@@ -538,6 +538,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['confirmar_compra'])) 
         function formatCVV(el) {
             el.value = onlyDigits(el.value).slice(0, 3); // máximo 3 dígitos
         }
-            </script>
+</script>
 </body>
 </html>
