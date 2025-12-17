@@ -22,7 +22,7 @@ register_shutdown_function(function () {
       'detail' => $err['message'] . ' @ ' . $err['file'] . ':' . $err['line']
     ], JSON_UNESCAPED_UNICODE);
   } else {
-    // Entrega cualquier salida pendiente (normalmente nada porque limpiamos antes de echo)
+    // Entrega cualquier salida pendiente
     if (ob_get_length()) ob_end_flush();
   }
 });

@@ -39,7 +39,6 @@ try {
   $stock    = (int)($_POST['entradasDisponibles'] ?? 0);
   $estadoId = (int)($_POST['idEstadoEvento'] ?? 0);
 
-  // 👇 NUEVO: pueden venir vacíos
   $idLugar = !empty($_POST['idLugar']) ? (int)$_POST['idLugar'] : null;
   if ($idLugar) {
   $stL = $db->prepare("SELECT nombre, ciudad FROM Lugar WHERE idLugar=:id");
@@ -60,7 +59,7 @@ try {
     json_error('Las entradas disponibles no pueden superar el aforo total.');
   }
 
-  /* === Imagen (opcional) === */
+  /* === Imagen === */
   try {
     $imagen = handle_image_upload('imagen'); // null si no suben
   } catch (RuntimeException $e) {
@@ -93,8 +92,6 @@ try {
   $eventoModel->entradasDisponibles = $stock;
   $eventoModel->imagenPrincipal     = $imagen;
   $eventoModel->idEstadoEvento      = $estadoId;
-
-  // 👇 NUEVO: pasar al modelo
   $eventoModel->idLugar             = $idLugar;
   $eventoModel->idOrganizador       = $idOrganizador;
 
@@ -108,7 +105,7 @@ try {
 } catch (Throwable $e) {
   json_error($e->getMessage(), 400);
 }
-// Guardar tipos de entrada (si vienen)
+// Guardar tipos de entrada
 if (!empty($_POST['tickets'])) {
   $tickets = json_decode($_POST['tickets'], true) ?: [];
   if ($tickets) {

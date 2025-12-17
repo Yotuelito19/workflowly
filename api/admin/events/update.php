@@ -10,7 +10,7 @@ set_error_handler(function ($severity, $message, $file, $line) {
   throw new ErrorException($message, 0, $severity, $file, $line);
 });
 
-/* SOLO actúa si hubo un fatal real; no toques respuestas válidas */
+/* SOLO actúa si hubo un fatal real */
 register_shutdown_function(function () {
   $err = error_get_last();
   if ($err && in_array($err['type'], [E_ERROR, E_PARSE, E_CORE_ERROR, E_COMPILE_ERROR])) {
@@ -61,8 +61,6 @@ try {
 
   $imagen = handle_image_upload('imagen');
   if ($imagen === null) $imagen = $actual['imagenPrincipal'];
-
-  // 👇 NUEVO: pueden venir vacíos
   $idLugar       = isset($_POST['idLugar']) && $_POST['idLugar'] !== '' ? (int)$_POST['idLugar'] : null;
   $idOrganizador = isset($_POST['idOrganizador']) && $_POST['idOrganizador'] !== '' ? (int)$_POST['idOrganizador'] : null;
 
@@ -78,7 +76,6 @@ try {
     'entradasDisponibles' => (int)($_POST['entradasDisponibles'] ?? $actual['entradasDisponibles']),
     'imagenPrincipal'     => $imagen,
     'idEstadoEvento'      => (int)($_POST['idEstadoEvento'] ?? $actual['idEstadoEvento']),
-    // 🔽🔽 NUEVO 🔽🔽
     'idLugar'             => $idLugar,
     'idOrganizador'       => $idOrganizador,
   ];
@@ -112,7 +109,7 @@ try {
 $del = $db->prepare("DELETE FROM TipoEntrada WHERE idEvento = :idEvento");
 $del->execute([':idEvento' => $idEvento]);
 
-// Insertar los nuevos (si vienen)
+// Insertar los nuevos
 if (!empty($_POST['tickets'])) {
   $tickets = json_decode($_POST['tickets'], true) ?: [];
   if ($tickets) {

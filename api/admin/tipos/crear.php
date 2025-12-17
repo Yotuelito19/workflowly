@@ -1,5 +1,4 @@
 <?php
-// api/admin/tipos/crear.php
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../config/database.php';
 
@@ -18,7 +17,7 @@ $in  = json_decode($raw, true) ?? [];
 
 $idEvento    = (int)($in['idEvento'] ?? 0);
 $nombre      = trim($in['nombre'] ?? '');
-$descripcion = trim($in['descripcion'] ?? '');   // 👈 nuevo
+$descripcion = trim($in['descripcion'] ?? '');
 $precio      = (float)($in['precio'] ?? 0);
 $cantidad    = (int)($in['cantidadDisponible'] ?? 0);
 
@@ -63,7 +62,7 @@ try {
   $stmt->execute([
     ':e' => $idEvento,
     ':n' => $nombre,
-    ':d' => $descripcion,     // 👈 la metemos aquí
+    ':d' => $descripcion,
     ':p' => $precio,
     ':c' => $cantidadFinal,
   ]);
@@ -75,7 +74,7 @@ try {
     'aforoTotal'       => $aforo,
     'usadosAntes'      => $usados,
     'libresAntes'      => $libres,
-    'descripcion'      => $descripcion,  // 👈 la devolvemos también
+    'descripcion'      => $descripcion,
   ]);
 } catch (Throwable $e) {
   http_response_code(500);

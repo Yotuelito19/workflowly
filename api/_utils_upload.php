@@ -3,7 +3,7 @@
 // Lanza RuntimeException con mensajes claros si hay error de subida.
 function handle_image_upload(string $field, string $dir = 'uploads'): ?string {
   if (!isset($_FILES[$field]) || $_FILES[$field]['error'] === UPLOAD_ERR_NO_FILE) {
-    return null;
+    return null; // no subieron imagen
   }
   $f = $_FILES[$field];
   if (!is_dir($dir)) {

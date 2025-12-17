@@ -1,5 +1,4 @@
 <?php
-// api/contact/contact_organizer.php
 declare(strict_types=1);
 
 header('Content-Type: application/json; charset=utf-8');
@@ -49,7 +48,7 @@ try {
   fail('Error al consultar el organizador.', 500);
 }
 
-// ---- Datos de remitente y CC (coincidir con tu sendmail.ini) ----
+// ---- Datos de remitente y CC (coincidir sendmail.ini) ----
 $from     = defined('MAIL_FROM')      ? MAIL_FROM      : 'soporteworkflowly@gmail.com';
 $fromName = defined('MAIL_FROM_NAME') ? MAIL_FROM_NAME : 'WorkFlowly';
 $cc       = defined('CONTACT_CC_EMAIL') ? CONTACT_CC_EMAIL : 'soporteworkflowly@gmail.com';

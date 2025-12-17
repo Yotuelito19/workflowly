@@ -1,5 +1,4 @@
 <?php
-// api/admin/tipos/eliminar.php
 require_once __DIR__ . '/../../../config/config.php';
 require_once __DIR__ . '/../../../config/database.php';
 
@@ -28,10 +27,10 @@ try {
     echo json_encode(['ok'=>false,'msg'=>'Tipo no encontrado']); exit;
   }
 
-  // No tocamos Evento; tu trigger/constraints lo dejan consistente
+  // No tocamos Evento; el trigger/constraints lo dejan consistente
   echo json_encode(['ok'=>true]);
 } catch (PDOException $e) {
-  // FK constraint (p.ej. ya hay ventas asociadas)
+  // FK constraint
   if ($e->getCode() === '23000') {
     echo json_encode([
       'ok'=>false,

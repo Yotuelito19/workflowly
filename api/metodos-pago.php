@@ -2,8 +2,7 @@
 
 <?php
 /**
- * API Simple para métodos de pago - PROTOTIPO
- * Sin validaciones reales - Solo para demostración
+ * API - para métodos de pago
  */
 
 require_once __DIR__ . '/../config/config.php';

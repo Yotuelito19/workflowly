@@ -44,8 +44,7 @@ try {
   }
 
   if (!$ok) { throw new Exception('DB error'); }
-
-  // recalcular stock del evento
+  
  // recalcular stock del evento, SIN superar el aforo
 $db->prepare(
   "UPDATE Evento e

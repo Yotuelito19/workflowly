@@ -1,7 +1,6 @@
 <?php
 /**
- * API para gestión de favoritos - WorkFlowly
- * Maneja agregar, eliminar, verificar y listar eventos favoritos
+ * API - para gestión de favoritos
  */
 
 // Headers
@@ -31,16 +30,13 @@ try {
 
 $idUsuario = (int)$_SESSION['user_id'];
 
-// ============================================
-// PROCESAR ACCIONES
-// ============================================
 
+// Procesar acciones
 try {
     switch ($accion) {
         
-        // ============================================
-        // LISTAR FAVORITOS
-        // ============================================
+        
+        // Listar favoritos
         case 'listar':
             $query = "SELECT 
                         e.idEvento,
@@ -78,9 +74,8 @@ try {
             ]);
             break;
         
-        // ============================================
-        // AGREGAR FAVORITO
-        // ============================================
+        
+        // Agregar favorito
         case 'agregar':
             if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
                 json_error('Método no permitido', 405);
@@ -121,7 +116,6 @@ try {
                 ]);
             }
             
-            // Agregar a favoritos
             $queryInsert = "INSERT INTO FavoritoEvento (idUsuario, idEvento, fechaAgregado) 
                            VALUES (:idUsuario, :idEvento, NOW())";
             $stmtInsert = $db->prepare($queryInsert);
@@ -194,9 +188,8 @@ try {
             ]);
             break;
         
-        // ============================================
-        // ACCIÓN NO VÁLIDA
-        // ============================================
+        
+        // Acción no válida
         default:
             json_error('Acción no válida. Acciones disponibles: listar, agregar, eliminar, verificar');
             break;

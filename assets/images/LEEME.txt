@@ -1,7 +1,0 @@
-Propósito: Imágenes estáticas del diseño
-
-- Logos del sitio
-- Iconos
-- Imágenes de decoración
-- Backgrounds fijos
-- Recursos gráficos de la interfaz
